@@ -1,0 +1,201 @@
+---
+import BreathingDot from "@/components/BreathingDot.tsx";
+
+const title = "run · coming soon";
+const description =
+	"A quiet running community. Log your runs, match distances, run together — for health and mindfulness, not competition.";
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content={description} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<main>
+			<section class="hero">
+				<div class="mark">
+					<BreathingDot client:load />
+					<span class="wordmark">run</span>
+				</div>
+				<h1>Find your pace.</h1>
+				<p class="tagline">
+					A quiet running community — log your runs, match distances, and run
+					together. Built for health and mindfulness, not the clock.
+				</p>
+				<p class="soon">Coming soon to <strong>run.snjv.club</strong></p>
+			</section>
+			<footer>
+				<span>An experiment by <a href="https://snjv.club">Sanjeev Gurung</a></span>
+			</footer>
+		</main>
+
+		<style is:global>
+			:root {
+				--bg: #0e1512;
+				--bg-glow: #16211c;
+				--fg: #e8efe9;
+				--muted: #8fa89b;
+				--accent: #57b894;
+				--accent-soft: rgba(87, 184, 148, 0.15);
+			}
+
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			html,
+			body {
+				height: 100%;
+			}
+
+			body {
+				font-family:
+					ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+					Helvetica, Arial, sans-serif;
+				color: var(--fg);
+				background:
+					radial-gradient(
+						1200px 800px at 50% -10%,
+						var(--bg-glow),
+						transparent 60%
+					),
+					var(--bg);
+				-webkit-font-smoothing: antialiased;
+			}
+
+			main {
+				min-height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 2rem;
+				text-align: center;
+			}
+
+			.hero {
+				max-width: 34rem;
+				display: flex;
+				flex-direction: column;
+				gap: 1.25rem;
+				animation: rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+			}
+
+			.mark {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.6rem;
+			}
+
+			.wordmark {
+				font-size: 1.35rem;
+				font-weight: 600;
+				letter-spacing: 0.02em;
+				color: var(--accent);
+			}
+
+			h1 {
+				font-size: clamp(2.4rem, 7vw, 3.75rem);
+				font-weight: 650;
+				line-height: 1.05;
+				letter-spacing: -0.02em;
+			}
+
+			.tagline {
+				font-size: clamp(1rem, 2.6vw, 1.2rem);
+				line-height: 1.65;
+				color: var(--muted);
+			}
+
+			.soon {
+				margin-top: 0.75rem;
+				font-size: 0.95rem;
+				color: var(--fg);
+			}
+
+			.soon strong {
+				color: var(--accent);
+				font-weight: 600;
+			}
+
+			footer {
+				position: fixed;
+				bottom: 1.5rem;
+				left: 0;
+				right: 0;
+				text-align: center;
+				font-size: 0.85rem;
+				color: var(--muted);
+			}
+
+			footer a {
+				color: var(--muted);
+				text-decoration: underline;
+				text-underline-offset: 3px;
+			}
+
+			footer a:hover {
+				color: var(--accent);
+			}
+
+			/* Breathing dot (rendered by the React island) */
+			.breathing-dot {
+				position: relative;
+				display: inline-flex;
+				width: 14px;
+				height: 14px;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.breathing-dot__core {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				background: var(--accent);
+				box-shadow: 0 0 0 0 var(--accent-soft);
+				animation: breathe 4s ease-in-out infinite;
+			}
+
+			@keyframes breathe {
+				0%,
+				100% {
+					transform: scale(0.9);
+					box-shadow: 0 0 0 0 var(--accent-soft);
+				}
+				50% {
+					transform: scale(1.1);
+					box-shadow: 0 0 0 10px transparent;
+				}
+			}
+
+			@keyframes rise {
+				from {
+					opacity: 0;
+					transform: translateY(12px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.hero {
+					animation: none;
+				}
+				.breathing-dot__core {
+					animation: none;
+				}
+			}
+		</style>
+	</body>
+</html>
