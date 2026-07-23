@@ -1,7 +1,7 @@
 ---
-import BreathingDot from "@/components/BreathingDot.tsx";
+import App from "@/components/App.tsx";
 
-const title = "run · coming soon";
+const title = "run";
 const description =
 	"A quiet running community. Log your runs, match distances, run together — for health and mindfulness, not competition.";
 ---
@@ -17,18 +17,11 @@ const description =
 	</head>
 	<body>
 		<main>
-			<section class="hero">
-				<div class="mark">
-					<BreathingDot client:load />
-					<span class="wordmark">run</span>
-				</div>
-				<h1>Find your pace.</h1>
-				<p class="tagline">
-					A quiet running community — log your runs, match distances, and run
-					together. Built for health and mindfulness, not the clock.
-				</p>
-				<p class="soon">Coming soon to <strong>run.snjv.club</strong></p>
-			</section>
+			<div class="mark">
+				<span class="dot"></span>
+				<span class="wordmark">run</span>
+			</div>
+			<App client:only="react" />
 			<footer>
 				<span>An experiment by <a href="https://snjv.club">Sanjeev Gurung</a></span>
 			</footer>
@@ -42,6 +35,8 @@ const description =
 				--muted: #8fa89b;
 				--accent: #57b894;
 				--accent-soft: rgba(87, 184, 148, 0.15);
+				--panel: rgba(255, 255, 255, 0.03);
+				--border: rgba(255, 255, 255, 0.08);
 			}
 
 			* {
@@ -78,60 +73,120 @@ const description =
 				justify-content: center;
 				padding: 2rem;
 				text-align: center;
-			}
-
-			.hero {
-				max-width: 34rem;
-				display: flex;
-				flex-direction: column;
-				gap: 1.25rem;
-				animation: rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+				gap: 1.5rem;
 			}
 
 			.mark {
 				display: inline-flex;
 				align-items: center;
-				justify-content: center;
-				gap: 0.6rem;
+				gap: 0.55rem;
+			}
+
+			.dot {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				background: var(--accent);
+				animation: breathe 4s ease-in-out infinite;
 			}
 
 			.wordmark {
-				font-size: 1.35rem;
+				font-size: 1.25rem;
 				font-weight: 600;
 				letter-spacing: 0.02em;
 				color: var(--accent);
 			}
 
-			h1 {
-				font-size: clamp(2.4rem, 7vw, 3.75rem);
+			/* Auth / app panels (rendered by React) */
+			.panel {
+				width: 100%;
+				max-width: 26rem;
+				display: flex;
+				flex-direction: column;
+				gap: 1.1rem;
+				padding: 2rem;
+				background: var(--panel);
+				border: 1px solid var(--border);
+				border-radius: 16px;
+				animation: rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+			}
+
+			.brand-title {
+				font-size: clamp(1.6rem, 5vw, 2.1rem);
 				font-weight: 650;
-				line-height: 1.05;
+				line-height: 1.1;
 				letter-spacing: -0.02em;
 			}
 
-			.tagline {
-				font-size: clamp(1rem, 2.6vw, 1.2rem);
-				line-height: 1.65;
+			.muted {
 				color: var(--muted);
+				line-height: 1.6;
+				font-size: 0.98rem;
 			}
 
-			.soon {
-				margin-top: 0.75rem;
-				font-size: 0.95rem;
+			.form {
+				display: flex;
+				flex-direction: column;
+				gap: 0.75rem;
+			}
+
+			.input {
+				width: 100%;
+				padding: 0.75rem 0.9rem;
+				border-radius: 10px;
+				border: 1px solid var(--border);
+				background: rgba(0, 0, 0, 0.25);
 				color: var(--fg);
+				font-size: 1rem;
 			}
 
-			.soon strong {
-				color: var(--accent);
+			.input:focus {
+				outline: none;
+				border-color: var(--accent);
+			}
+
+			.btn {
+				width: 100%;
+				padding: 0.8rem 1rem;
+				border-radius: 10px;
+				border: none;
+				background: var(--accent);
+				color: #05110c;
+				font-size: 1rem;
 				font-weight: 600;
+				cursor: pointer;
+				transition: opacity 150ms ease;
+			}
+
+			.btn:hover {
+				opacity: 0.9;
+			}
+
+			.btn:disabled {
+				opacity: 0.6;
+				cursor: default;
+			}
+
+			.link {
+				background: none;
+				border: none;
+				color: var(--muted);
+				font-size: 0.9rem;
+				cursor: pointer;
+				text-decoration: underline;
+				text-underline-offset: 3px;
+			}
+
+			.link:hover {
+				color: var(--accent);
+			}
+
+			.error {
+				color: #ff8080;
+				font-size: 0.9rem;
 			}
 
 			footer {
-				position: fixed;
-				bottom: 1.5rem;
-				left: 0;
-				right: 0;
-				text-align: center;
 				font-size: 0.85rem;
 				color: var(--muted);
 			}
@@ -146,41 +201,20 @@ const description =
 				color: var(--accent);
 			}
 
-			/* Breathing dot (rendered by the React island) */
-			.breathing-dot {
-				position: relative;
-				display: inline-flex;
-				width: 14px;
-				height: 14px;
-				align-items: center;
-				justify-content: center;
-			}
-
-			.breathing-dot__core {
-				width: 10px;
-				height: 10px;
-				border-radius: 50%;
-				background: var(--accent);
-				box-shadow: 0 0 0 0 var(--accent-soft);
-				animation: breathe 4s ease-in-out infinite;
-			}
-
 			@keyframes breathe {
 				0%,
 				100% {
 					transform: scale(0.9);
-					box-shadow: 0 0 0 0 var(--accent-soft);
 				}
 				50% {
 					transform: scale(1.1);
-					box-shadow: 0 0 0 10px transparent;
 				}
 			}
 
 			@keyframes rise {
 				from {
 					opacity: 0;
-					transform: translateY(12px);
+					transform: translateY(10px);
 				}
 				to {
 					opacity: 1;
@@ -189,10 +223,8 @@ const description =
 			}
 
 			@media (prefers-reduced-motion: reduce) {
-				.hero {
-					animation: none;
-				}
-				.breathing-dot__core {
+				.dot,
+				.panel {
 					animation: none;
 				}
 			}
