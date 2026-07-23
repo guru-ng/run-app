@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Match } from "@/lib/types";
+import { startOfWeekIso } from "@/lib/dates";
 
 export default function MatchesFeed({
 	userId,
@@ -58,11 +59,4 @@ export default function MatchesFeed({
 			</div>
 		</>
 	);
-}
-
-function startOfWeekIso() {
-	const now = new Date();
-	const day = (now.getDay() + 6) % 7; // 0 = Monday
-	now.setDate(now.getDate() - day);
-	return now.toISOString().slice(0, 10);
 }

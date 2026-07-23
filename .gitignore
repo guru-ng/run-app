@@ -32,3 +32,6 @@ yarn-error.log*
 # local-only notes / DB migrations (not version-controlled)
 HANDOFF.md
 /supabase/
+
+#stitch UI design folder
+/stitch_green_pace_run_tracker/

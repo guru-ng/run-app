@@ -1,0 +1,66 @@
+---
+interface Props {
+	showBack?: boolean;
+}
+const { showBack = false } = Astro.props;
+---
+
+<div class="site-header">
+	<div class="site-header-left">
+		{
+			showBack && (
+				<a href="/" class="back-arrow" aria-label="Back to dashboard">
+					←
+				</a>
+			)
+		}
+	</div>
+	<div class="mark">
+		<span class="dot"></span>
+		<span class="wordmark">run</span>
+	</div>
+	<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark theme">
+		<svg
+			class="icon-moon"
+			width="18"
+			height="18"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg
+		>
+		<svg
+			class="icon-sun"
+			width="18"
+			height="18"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			><circle cx="12" cy="12" r="4"></circle><path
+				d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+			></path></svg
+		>
+	</button>
+</div>
+
+<script is:inline>
+	(function () {
+		var root = document.documentElement;
+		var stored = localStorage.getItem("theme");
+		var theme =
+			stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+		root.dataset.theme = theme;
+
+		document.addEventListener("click", function (e) {
+			var btn = e.target.closest("#theme-toggle");
+			if (!btn) return;
+			root.dataset.theme = root.dataset.theme === "light" ? "dark" : "light";
+			localStorage.setItem("theme", root.dataset.theme);
+		});
+	})();
+</script>

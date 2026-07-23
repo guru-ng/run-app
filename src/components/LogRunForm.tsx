@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Run } from "@/lib/types";
+import { todayIso } from "@/lib/dates";
 
 export default function LogRunForm({
 	userId,
@@ -69,6 +70,7 @@ export default function LogRunForm({
 				placeholder="Notes (optional)"
 				value={notes}
 				onChange={(e) => setNotes(e.target.value)}
+				maxLength={300}
 			/>
 			{error && <p className="error">{error}</p>}
 			<button className="btn" type="submit" disabled={busy}>
@@ -76,8 +78,4 @@ export default function LogRunForm({
 			</button>
 		</form>
 	);
-}
-
-function todayIso() {
-	return new Date().toISOString().slice(0, 10);
 }

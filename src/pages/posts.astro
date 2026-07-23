@@ -1,11 +1,9 @@
 ---
 import "@/styles/global.css";
-import App from "@/components/App.tsx";
+import PostsPage from "@/components/PostsPage.tsx";
 import SiteHeader from "@/components/SiteHeader.astro";
 
-const title = "run";
-const description =
-	"A quiet running community. Log your runs, match distances, run together — for health and mindfulness, not competition.";
+const title = "run — logs";
 ---
 
 <!doctype html>
@@ -13,7 +11,6 @@ const description =
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,11 +22,8 @@ const description =
 	</head>
 	<body>
 		<main>
-			<SiteHeader />
-			<App client:only="react" />
-			<footer>
-				<span>An experiment by <a href="https://snjv.club">Sanjeev Gurung</a></span>
-			</footer>
+			<SiteHeader showBack />
+			<PostsPage client:only="react" />
 		</main>
 	</body>
 </html>
