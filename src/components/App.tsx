@@ -4,6 +4,12 @@ import { configError, supabase } from "@/lib/supabase";
 
 type Profile = { id: string; display_name: string };
 type Phase = "loading" | "signed-out" | "needs-invite" | "ready";
+type Run = {
+	id: string;
+	distance_km: number;
+	run_date: string;
+	notes: string | null;
+};
 
 // Catches any render/runtime error and shows it on the page instead of a blank screen.
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -194,6 +200,51 @@ function InviteScreen({ onRedeemed }: { onRedeemed: (p: Profile) => void }) {
 }
 
 function Dashboard({ profile }: { profile: Profile }) {
+	const [runs, setRuns] = useState<Run[] | null>(null);
+	const [distanceKm, setDistanceKm] = useState("");
+	const [runDate, setRunDate] = useState(() => todayIso());
+	const [notes, setNotes] = useState("");
+	const [busy, setBusy] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		supabase
+			.from("runs")
+			.select("id, distance_km, run_date, notes")
+			.eq("user_id", profile.id)
+			.order("run_date", { ascending: false })
+			.order("created_at", { ascending: false })
+			.then(({ data }) => setRuns((data as Run[]) ?? []));
+	}, [profile.id]);
+
+	async function logRun(e: React.FormEvent) {
+		e.preventDefault();
+		setBusy(true);
+		setError(null);
+
+		const { data, error: insertError } = await supabase
+			.from("runs")
+			.insert({
+				user_id: profile.id,
+				distance_km: Number(distanceKm),
+				run_date: runDate,
+				notes: notes.trim() || null,
+			})
+			.select("id, distance_km, run_date, notes")
+			.single();
+
+		if (insertError) {
+			setError(insertError.message);
+			setBusy(false);
+			return;
+		}
+
+		setRuns((prev) => [data as Run, ...(prev ?? [])]);
+		setDistanceKm("");
+		setNotes("");
+		setBusy(false);
+	}
+
 	async function signOut() {
 		await supabase.auth.signOut();
 	}
@@ -201,12 +252,61 @@ function Dashboard({ profile }: { profile: Profile }) {
 	return (
 		<div className="panel">
 			<h1 className="brand-title">Welcome, {profile.display_name}.</h1>
-			<p className="muted">
-				You're in. Run logging and distance matching are coming next.
-			</p>
+			<form className="form" onSubmit={logRun}>
+				<input
+					className="input"
+					type="number"
+					inputMode="decimal"
+					step="0.01"
+					min="0.01"
+					max="999.99"
+					placeholder="Distance (km)"
+					value={distanceKm}
+					onChange={(e) => setDistanceKm(e.target.value)}
+					required
+				/>
+				<input
+					className="input"
+					type="date"
+					value={runDate}
+					onChange={(e) => setRunDate(e.target.value)}
+					required
+				/>
+				<input
+					className="input"
+					placeholder="Notes (optional)"
+					value={notes}
+					onChange={(e) => setNotes(e.target.value)}
+				/>
+				{error && <p className="error">{error}</p>}
+				<button className="btn" type="submit" disabled={busy}>
+					{busy ? "Logging…" : "Log run"}
+				</button>
+			</form>
+
+			<div className="runs-list">
+				{runs === null ? (
+					<p className="muted">Loading your runs…</p>
+				) : runs.length === 0 ? (
+					<p className="muted">No runs logged yet.</p>
+				) : (
+					runs.map((run) => (
+						<div className="run-item" key={run.id}>
+							<span>{run.run_date}</span>
+							<span>{run.distance_km} km</span>
+							{run.notes && <span className="muted">{run.notes}</span>}
+						</div>
+					))
+				)}
+			</div>
+
 			<button className="link" onClick={signOut}>
 				Sign out
 			</button>
 		</div>
 	);
+}
+
+function todayIso() {
+	return new Date().toISOString().slice(0, 10);
 }
