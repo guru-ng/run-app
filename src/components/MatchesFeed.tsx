@@ -38,15 +38,15 @@ export default function MatchesFeed({
 	return (
 		<>
 			<h2 className="brand-title" style={{ fontSize: "1.1rem" }}>
-				Runners near your pace
+				Similar distance this week
 			</h2>
 			<div className="runs-list">
 				{myLatestDistance == null ? (
-					<p className="muted">Log a run to see who's near your pace this week.</p>
+					<p className="muted">Log a run to see others with a similar distance this week.</p>
 				) : matches === null ? (
 					<p className="muted">Loading matches…</p>
 				) : matches.length === 0 ? (
-					<p className="muted">No one within 0.5 km of your pace this week yet.</p>
+					<p className="muted">No one within 0.5 km of your distance this week yet.</p>
 				) : (
 					matches.map((match, i) => (
 						<div className="run-item" key={i}>

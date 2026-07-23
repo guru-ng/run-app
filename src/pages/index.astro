@@ -13,6 +13,12 @@ const description =
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Neuton:wght@400;700;800&display=swap"
+			rel="stylesheet"
+		/>
 		<title>{title}</title>
 	</head>
 	<body>
@@ -51,9 +57,7 @@ const description =
 			}
 
 			body {
-				font-family:
-					ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-					Helvetica, Arial, sans-serif;
+				font-family: "Neuton", Georgia, "Times New Roman", serif;
 				color: var(--fg);
 				background:
 					radial-gradient(
