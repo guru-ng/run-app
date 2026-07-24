@@ -92,7 +92,14 @@ function AppInner() {
 			/>
 		);
 
-	return <Dashboard profile={profile as Profile} />;
+	return (
+		<Dashboard
+			profile={profile as Profile}
+			onProfileChanged={(name) =>
+				setProfile((p) => (p ? { ...p, display_name: name } : p))
+			}
+		/>
+	);
 }
 
 function Centered({ children }: { children: React.ReactNode }) {

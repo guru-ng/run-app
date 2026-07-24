@@ -3,7 +3,10 @@ export function todayIso() {
 }
 
 export function dateToIso(d: Date) {
-	return d.toISOString().slice(0, 10);
+	const y = d.getFullYear();
+	const m = String(d.getMonth() + 1).padStart(2, "0");
+	const day = String(d.getDate()).padStart(2, "0");
+	return `${y}-${m}-${day}`;
 }
 
 export function isoToDate(iso: string) {
@@ -15,6 +18,11 @@ export function addDaysIso(iso: string, days: number) {
 	const d = isoToDate(iso);
 	d.setDate(d.getDate() + days);
 	return dateToIso(d);
+}
+
+/** First-of-month `months` away from `d` (pinned to day 1 to dodge overflow, e.g. Jan 31 + 1mo). */
+export function addMonths(d: Date, months: number) {
+	return new Date(d.getFullYear(), d.getMonth() + months, 1);
 }
 
 /** Monday of the week containing `date` (or today). */

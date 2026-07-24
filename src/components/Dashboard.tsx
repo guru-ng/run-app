@@ -6,6 +6,12 @@ import RunsList from "@/components/RunsList";
 import MatchesFeed from "@/components/MatchesFeed";
 import AvailabilityCard from "@/components/AvailabilityCard";
 import LatestLogsCard from "@/components/LatestLogsCard";
+import TabBar, { type TabId } from "@/components/TabBar";
+import { STACK_BREAKPOINT } from "@/components/SwipeStack";
+import DashboardTab from "@/components/DashboardTab";
+import LogTab from "@/components/LogTab";
+import ScheduleTab from "@/components/ScheduleTab";
+import ProfileTab from "@/components/ProfileTab";
 
 type PlannedRunRow = {
 	id: string;
@@ -16,9 +22,25 @@ type PlannedRunRow = {
 	profiles: { display_name: string } | null;
 };
 
-export default function Dashboard({ profile }: { profile: Profile }) {
+export default function Dashboard({
+	profile,
+	onProfileChanged,
+}: {
+	profile: Profile;
+	onProfileChanged: (name: string) => void;
+}) {
 	const [runs, setRuns] = useState<Run[] | null>(null);
 	const [allPlans, setAllPlans] = useState<DayAvailability[] | null>(null);
+	const [isMobile, setIsMobile] = useState(false);
+	const [activeTab, setActiveTab] = useState<TabId>("dashboard");
+
+	useEffect(() => {
+		const mql = window.matchMedia(STACK_BREAKPOINT);
+		setIsMobile(mql.matches);
+		const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+		mql.addEventListener("change", onChange);
+		return () => mql.removeEventListener("change", onChange);
+	}, []);
 
 	useEffect(() => {
 		supabase
@@ -72,15 +94,49 @@ export default function Dashboard({ profile }: { profile: Profile }) {
 		await supabase.auth.signOut();
 	}
 
+	function logRun(run: Run) {
+		setRuns((prev) => [run, ...(prev ?? [])]);
+	}
+
+	if (isMobile) {
+		return (
+			<>
+				<div className="tab-content">
+					{activeTab === "dashboard" && (
+						<DashboardTab
+							userId={profile.id}
+							runs={runs}
+							allPlans={allPlans}
+							myLatestDistance={myLatestDistance}
+						/>
+					)}
+					{activeTab === "log" && (
+						<LogTab userId={profile.id} runs={runs} onLogged={logRun} />
+					)}
+					{activeTab === "schedule" && (
+						<ScheduleTab
+							userId={profile.id}
+							allPlans={allPlans}
+							onScheduled={addScheduled}
+							onCanceled={removeScheduled}
+						/>
+					)}
+					{activeTab === "profile" && (
+						<ProfileTab profile={profile} onNameChanged={onProfileChanged} onSignOut={signOut} />
+					)}
+				</div>
+				<TabBar active={activeTab} onChange={setActiveTab} />
+			</>
+		);
+	}
+
+	// Desktop: existing plain multi-column layout — no tabs, everything visible at once.
 	return (
 		<div className="dashboard-columns">
 			<div className="panel">
 				<h1 className="brand-title">Welcome, {profile.display_name}.</h1>
 
-				<LogRunForm
-					userId={profile.id}
-					onLogged={(run) => setRuns((prev) => [run, ...(prev ?? [])])}
-				/>
+				<LogRunForm userId={profile.id} onLogged={logRun} />
 
 				<RunsList runs={runs} />
 

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { DayAvailability, PlannedRun } from "@/lib/types";
-import { getMonthGrid, todayIso } from "@/lib/dates";
+import { addMonths, getMonthGrid, todayIso } from "@/lib/dates";
 import ScheduleModal from "@/components/ScheduleModal";
 
 const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -18,8 +18,9 @@ export default function AvailabilityCard({
 	onCanceled: (id: string) => void;
 }) {
 	const [modalDate, setModalDate] = useState<string | null>(null);
+	const [viewedMonth, setViewedMonth] = useState(() => new Date());
 
-	const cells = getMonthGrid();
+	const cells = getMonthGrid(viewedMonth);
 
 	const plansByDate = useMemo(() => {
 		const map = new Map<string, DayAvailability[]>();
@@ -52,6 +53,25 @@ export default function AvailabilityCard({
 				</h2>
 				<button className="btn btn-small" onClick={() => setModalDate(todayIso())}>
 					Schedule run
+				</button>
+			</div>
+			<div className="calendar-month-nav">
+				<button
+					className="page-nav-btn"
+					onClick={() => setViewedMonth((d) => addMonths(d, -1))}
+					aria-label="Previous month"
+				>
+					‹
+				</button>
+				<span className="calendar-month-label">
+					{viewedMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+				</span>
+				<button
+					className="page-nav-btn"
+					onClick={() => setViewedMonth((d) => addMonths(d, 1))}
+					aria-label="Next month"
+				>
+					›
 				</button>
 			</div>
 			<div className="calendar-grid calendar-weekdays">

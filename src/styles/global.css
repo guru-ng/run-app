@@ -1,550 +1,872 @@
 :root {
-	--bg: #0e1512;
-	--bg-glow: #16211c;
-	--fg: #e8efe9;
-	--muted: #8fa89b;
-	--accent: #57b894;
-	--accent-soft: rgba(87, 184, 148, 0.15);
-	--panel: rgba(255, 255, 255, 0.03);
-	--border: rgba(255, 255, 255, 0.08);
-	--icon-color: var(--fg);
+  --bg: #0e1512;
+  --bg-glow: #16211c;
+  --fg: #e8efe9;
+  --muted: #8fa89b;
+  --accent: #57b894;
+  --accent-soft: rgba(87, 184, 148, 0.15);
+  --panel: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --icon-color: var(--fg);
 }
 
 :root[data-theme="light"] {
-	--bg: #f4f7f5;
-	--bg-glow: #e6ede9;
-	--fg: #10221a;
-	--muted: #5b7568;
-	--accent: #1f8f68;
-	--accent-soft: rgba(31, 143, 104, 0.12);
-	--panel: rgba(0, 0, 0, 0.03);
-	--border: rgba(0, 0, 0, 0.1);
-	--icon-color: var(--fg);
+  --bg: #f4f7f5;
+  --bg-glow: #e6ede9;
+  --fg: #10221a;
+  --muted: #5b7568;
+  --accent: #1f8f68;
+  --accent-soft: rgba(31, 143, 104, 0.12);
+  --panel: rgba(0, 0, 0, 0.03);
+  --border: rgba(0, 0, 0, 0.1);
+  --icon-color: var(--fg);
 }
 
 * {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body {
-	height: 100%;
+  height: 100%;
 }
 
 body {
-	font-family: "Neuton", Georgia, "Times New Roman", serif;
-	color: var(--fg);
-	background:
-		radial-gradient(1200px 800px at 50% -10%, var(--bg-glow), transparent 60%),
-		var(--bg);
-	-webkit-font-smoothing: antialiased;
-	transition:
-		background-color 200ms ease,
-		color 200ms ease;
+  font-family: "Neuton", Georgia, "Times New Roman", serif;
+  color: var(--fg);
+  background:
+    radial-gradient(1200px 800px at 50% -10%, var(--bg-glow), transparent 60%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
 }
 
 main {
-	min-height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 2rem;
-	text-align: center;
-	gap: 1.5rem;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  gap: 1.5rem;
 }
 
 .site-header {
-	width: 100%;
-	max-width: 40rem;
-	margin: 0 auto;
-	display: grid;
-	grid-template-columns: 1fr auto 1fr;
-	align-items: center;
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
 }
 
 .site-header-left {
-	justify-self: start;
+  justify-self: start;
 }
 
 .mark {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.55rem;
-	justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  justify-self: center;
 }
 
 .dot {
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background: var(--accent);
-	animation: breathe 4s ease-in-out infinite;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: breathe 4s ease-in-out infinite;
 }
 
 .wordmark {
-	font-size: 1.25rem;
-	font-weight: 600;
-	letter-spacing: 0.02em;
-	color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
 }
 
 .wordmark::first-letter {
-	font-weight: 800;
-	font-size: 1.15em;
+  font-weight: 800;
+  font-size: 1.15em;
 }
 
 .back-arrow {
-	color: var(--icon-color);
-	font-size: 1.4rem;
-	text-decoration: none;
-	line-height: 1;
-	padding: 0.25rem 0.5rem;
-	border-radius: 8px;
+  color: var(--icon-color);
+  font-size: 1.4rem;
+  text-decoration: none;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
 }
 
 .back-arrow:hover {
-	background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .theme-toggle {
-	justify-self: end;
-	background: none;
-	border: none;
-	cursor: pointer;
-	color: var(--icon-color);
-	padding: 0.4rem;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  justify-self: end;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--icon-color);
+  padding: 0.4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .theme-toggle:hover {
-	background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .theme-toggle .icon-sun {
-	display: none;
+  display: none;
 }
 
 :root[data-theme="light"] .theme-toggle .icon-sun {
-	display: block;
+  display: block;
 }
 
 :root[data-theme="light"] .theme-toggle .icon-moon {
-	display: none;
+  display: none;
 }
 
 /* Auth / app panels (rendered by React) */
 .panel {
-	width: 100%;
-	max-width: 26rem;
-	display: flex;
-	flex-direction: column;
-	gap: 1.1rem;
-	padding: 2rem;
-	background: var(--panel);
-	border: 1px solid var(--border);
-	border-radius: 16px;
-	animation: rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  width: 100%;
+  max-width: 26rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 2rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  animation: rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Mobile tab panels (Log/Schedule/Profile) match the deck-card/post-card
+   width so nothing jumps in size when swiping between dashboard tabs —
+   scoped here rather than on .panel itself, which desktop also uses. */
+.tab-panel {
+  max-width: 20rem;
+  min-height: 536.9px;
 }
 
 .brand-title {
-	font-size: clamp(1.6rem, 5vw, 2.1rem);
-	font-weight: 650;
-	line-height: 1.1;
-	letter-spacing: -0.02em;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .muted {
-	color: var(--muted);
-	line-height: 1.6;
-	font-size: 0.98rem;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 0.98rem;
 }
 
 .form {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .input {
-	width: 100%;
-	padding: 0.75rem 0.9rem;
-	border-radius: 10px;
-	border: 1px solid var(--border);
-	background: rgba(0, 0, 0, 0.25);
-	color: var(--fg);
-	font-size: 1rem;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--fg);
+  font-size: 1rem;
 }
 
 :root[data-theme="light"] .input {
-	background: rgba(0, 0, 0, 0.04);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .input:focus {
-	outline: none;
-	border-color: var(--accent);
+  outline: none;
+  border-color: var(--accent);
 }
 
 .btn {
-	width: 100%;
-	padding: 0.8rem 1rem;
-	border-radius: 10px;
-	border: none;
-	background: var(--accent);
-	color: #05110c;
-	font-size: 1rem;
-	font-weight: 600;
-	cursor: pointer;
-	transition: opacity 150ms ease;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #05110c;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease;
 }
 
 .btn:hover {
-	opacity: 0.9;
+  opacity: 0.9;
 }
 
 .btn:disabled {
-	opacity: 0.6;
-	cursor: default;
+  opacity: 0.6;
+  cursor: default;
 }
 
 .link {
-	background: none;
-	border: none;
-	color: var(--muted);
-	font-size: 0.9rem;
-	cursor: pointer;
-	text-decoration: underline;
-	text-underline-offset: 3px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .link:hover {
-	color: var(--accent);
+  color: var(--accent);
 }
 
 .error {
-	color: #ff8080;
-	font-size: 0.9rem;
+  color: #ff8080;
+  font-size: 0.9rem;
 }
 
 .runs-list {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	max-height: 16rem;
-	overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 16rem;
+  overflow-y: auto;
 }
 
 .run-item {
-	display: flex;
-	justify-content: space-between;
-	gap: 0.75rem;
-	padding: 0.6rem 0.75rem;
-	border-radius: 8px;
-	background: rgba(0, 0, 0, 0.2);
-	font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 0.9rem;
 }
 
 :root[data-theme="light"] .run-item {
-	background: rgba(0, 0, 0, 0.03);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .run-item span:last-child {
-	text-align: right;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dashboard-columns {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: stretch;
-	gap: 1.5rem;
-	width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .side-panel {
-	text-align: left;
+  text-align: left;
 }
 
 .btn-small {
-	width: auto;
-	padding: 0.5rem 0.9rem;
-	font-size: 0.85rem;
+  width: auto;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
 }
 
 .calendar-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 0.5rem;
-	text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.calendar-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-month-label {
+  min-width: 9rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .calendar-grid {
-	display: grid;
-	grid-template-columns: repeat(7, 1fr);
-	gap: 0.25rem;
-	margin-bottom: 0.25rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .calendar-weekday {
-	font-size: 0.7rem;
-	color: var(--muted);
-	text-align: center;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
 }
 
 .calendar-day-wrap {
-	position: relative;
+  position: relative;
 }
 
 .calendar-day {
-	position: relative;
-	width: 100%;
-	height: 2rem;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 0.8rem;
-	border-radius: 50%;
-	border: none;
-	background: transparent;
-	color: var(--fg);
-	cursor: pointer;
+  position: relative;
+  width: 100%;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
 }
 
 .calendar-day:hover {
-	background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .calendar-day.outside {
-	color: rgba(232, 239, 233, 0.25);
+  color: rgba(232, 239, 233, 0.25);
 }
 
 :root[data-theme="light"] .calendar-day.outside {
-	color: rgba(16, 34, 26, 0.25);
+  color: rgba(16, 34, 26, 0.25);
 }
 
 .calendar-day.today {
-	background: var(--accent);
-	color: #05110c;
-	font-weight: 700;
+  background: var(--accent);
+  color: #05110c;
+  font-weight: 700;
 }
 
 .calendar-day.planned:not(.today) {
-	background: var(--accent-soft);
-	border: 1px solid rgba(87, 184, 148, 0.3);
+  background: var(--accent-soft);
+  border: 1px solid rgba(87, 184, 148, 0.3);
 }
 
 .calendar-dot {
-	position: absolute;
-	bottom: 2px;
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	background: var(--accent);
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .calendar-day.today .calendar-dot {
-	background: #05110c;
+  background: #05110c;
 }
 
 .calendar-tooltip {
-	display: none;
-	position: absolute;
-	bottom: 110%;
-	left: 50%;
-	transform: translateX(-50%);
-	user-select: text;
-	background: var(--bg-glow);
-	border: 1px solid var(--border);
-	border-radius: 8px;
-	padding: 0.5rem 0.65rem;
-	font-size: 0.75rem;
-	white-space: nowrap;
-	z-index: 20;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: none;
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  user-select: text;
+  background: var(--bg-glow);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .calendar-day-wrap:hover .calendar-tooltip {
-	display: block;
+  display: block;
 }
 
 .calendar-tooltip-row {
-	display: flex;
-	align-items: center;
-	gap: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .calendar-tooltip-row + .calendar-tooltip-row {
-	margin-top: 0.25rem;
+  margin-top: 0.25rem;
 }
 
 .trash-btn {
-	background: none;
-	border: none;
-	cursor: pointer;
-	font-size: 0.85rem;
-	line-height: 1;
-	padding: 0.15rem;
-	opacity: 0.7;
-	margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0.15rem;
+  opacity: 0.7;
+  margin-left: auto;
 }
 
 .trash-btn:hover {
-	opacity: 1;
+  opacity: 1;
 }
 
 .existing-plan-notice {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 0.5rem;
-	background: rgba(255, 255, 255, 0.04);
-	border: 1px solid var(--border);
-	border-radius: 8px;
-	padding: 0.6rem 0.75rem;
-	font-size: 0.85rem;
-	color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .modal-overlay {
-	position: fixed;
-	inset: 0;
-	background: var(--bg);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 100;
-	padding: 1.5rem;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
 }
 
 .modal-box {
-	width: 100%;
-	max-width: 24rem;
-	text-align: left;
-	background: var(--bg-glow);
-	user-select: text;
+  width: 100%;
+  max-width: 24rem;
+  text-align: left;
+  background: var(--bg-glow);
+  user-select: text;
 }
 
 .modal-actions {
-	display: flex;
-	gap: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
 }
 
 .modal-actions .btn {
-	flex: 1;
+  flex: 1;
 }
 
 .btn-secondary {
-	background: transparent;
-	border: 1px solid var(--border);
-	color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
 }
 
 .btn-secondary:hover {
-	background: rgba(255, 255, 255, 0.06);
-	opacity: 1;
+  background: rgba(255, 255, 255, 0.06);
+  opacity: 1;
 }
 
 .modal-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .modal-close {
-	font-size: 1.5rem;
-	line-height: 1;
-	padding: 0 0.25rem;
-	text-decoration: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+  text-decoration: none;
 }
 
 .modal-label {
-	font-size: 0.8rem;
-	color: var(--muted);
+  font-size: 0.8rem;
+  color: var(--muted);
 }
 
 .time-options {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
 }
 
 .time-option {
-	padding: 0.5rem;
-	border-radius: 8px;
-	border: 1px solid var(--border);
-	background: transparent;
-	color: var(--fg);
-	font-size: 0.85rem;
-	cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
 .time-option.active {
-	border-color: var(--accent);
-	background: var(--accent-soft);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .posts-grid {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 1.5rem;
-	width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .post-card {
-	width: 100%;
-	max-width: 20rem;
-	text-align: left;
+  max-width: 20rem;
+  text-align: left;
+  background: var(--bg-glow);
+}
+
+.post-card .runs-list {
+  flex: 1;
+  max-height: none;
+}
+
+/* Dashboard-tab deck cards (Insights / Recent Activity / Matches / Upcoming) —
+   one item per card, see CLAUDE.md "Deck architecture". */
+.deck-stack-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  width: 100%;
+}
+
+/* deck-stack-group centers its children instead of stretching them, so a
+   deck's heading+SwipeStack wrapper needs an explicit width or it
+   shrinks-to-fit the heading text instead of filling the row. */
+.deck-section {
+  width: 100%;
+}
+
+.deck-card {
+  max-width: 20rem;
+  text-align: left;
+  justify-content: center;
+}
+
+.deck-card-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.deck-card-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.deck-card-metric {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.post-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.post-card-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.page-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.page-nav-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--accent);
+}
+
+.page-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.loading-runner {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.runner-icon {
+  display: inline-block;
+  animation: runner-bounce 0.6s ease-in-out infinite;
+}
+
+.runner-track {
+  width: 1.75rem;
+  height: 2px;
+  border-radius: 2px;
+  background-image: linear-gradient(90deg, var(--accent) 0%, transparent 65%);
+  background-size: 200% 100%;
+  animation: runner-track-move 0.6s linear infinite;
+}
+
+.swipe-hint {
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.swipe-arrow {
+  display: inline-block;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.swipe-arrow-left {
+  animation: swipe-left-hint 1.6s ease-in-out infinite;
+}
+
+.swipe-arrow-right {
+  animation: swipe-right-hint 1.6s ease-in-out infinite;
+}
+
+/* Generic swipeable card-deck, used on small screens by <SwipeStack> — the
+   panel/post-card children keep their own visual styling; this just
+   overlaps them in a single grid cell (so the container height auto-fits
+   the tallest one) and animates the active one via inline transform. */
+.swipe-stack {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.swipe-stack-item {
+  grid-row: 2;
+  grid-column: 1;
+  width: 100%;
+  touch-action: pan-y;
+  cursor: grab;
+  background: var(--bg-glow);
+}
+
+.swipe-dots {
+  grid-row: 3;
+  grid-column: 1;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.swipe-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.swipe-dot-active {
+  background: var(--accent);
+}
+
+/* Bottom tab bar — mobile-only navigation shell for the dashboard
+   (see CLAUDE.md, "Deck architecture"). Desktop keeps the plain
+   multi-column layout instead, no tabs. */
+.tab-bar {
+  display: none;
+}
+
+.tab-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .tab-bar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    gap: 0.25rem;
+    background: var(--bg-glow);
+    border-top: 1px solid var(--border);
+    padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .tab-content {
+    padding-bottom: 4.5rem;
+  }
+}
+
+.tab-bar-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.35rem 0.25rem;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab-bar-btn-active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.tab-bar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.tab-bar-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
 }
 
 footer {
-	font-size: 0.85rem;
-	color: var(--muted);
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 footer a {
-	color: var(--muted);
-	text-decoration: underline;
-	text-underline-offset: 3px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 footer a:hover {
-	color: var(--accent);
+  color: var(--accent);
 }
 
 @keyframes breathe {
-	0%,
-	100% {
-		transform: scale(0.9);
-	}
-	50% {
-		transform: scale(1.1);
-	}
+  0%,
+  100% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 @keyframes rise {
-	from {
-		opacity: 0;
-		transform: translateY(10px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes runner-bounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(8deg);
+  }
+}
+
+@keyframes runner-track-move {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes swipe-left-hint {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(-6px);
+    opacity: 1;
+  }
+}
+
+@keyframes swipe-right-hint {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.dot,
-	.panel {
-		animation: none;
-	}
+  .dot,
+  .panel,
+  .runner-icon,
+  .runner-track,
+  .swipe-arrow-left,
+  .swipe-arrow-right {
+    animation: none;
+  }
 }
