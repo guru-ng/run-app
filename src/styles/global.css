@@ -51,6 +51,10 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* Centring a taller-than-viewport page pushes its top above the scroll
+     origin, where it can't be reached. `safe` falls back to flex-start exactly
+     when that would happen; browsers without it just keep plain `center`. */
+  justify-content: safe center;
   padding: 2rem;
   text-align: center;
   gap: 1.5rem;
@@ -103,6 +107,14 @@ main {
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
+  }
+
+  /* Both dashboard rows drop to a single column in this range, so the content
+     genuinely can't fit 34rem — let the box grow instead of spilling out of a
+     fixed height. Constant-height holds from ~976px up, where it's designed. */
+  .app-main {
+    height: auto;
+    min-height: 34rem;
   }
 }
 

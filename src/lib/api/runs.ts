@@ -91,6 +91,10 @@ export async function fetchRunsFeed(opts: {
 	return { data: error ? null : rows.map(mapFeedRow), error };
 }
 
+/** How many candidates to rank, and how many of those to actually return. */
+const MATCH_CANDIDATE_LIMIT = 200;
+const MATCH_LIMIT = 12;
+
 /** Others within +/-0.5km of `myLatestDistance`, logged this week, closest first. */
 export async function fetchMatches(opts: {
 	userId: string;
@@ -102,10 +106,12 @@ export async function fetchMatches(opts: {
 		.gte("run_date", startOfWeekIso())
 		.gte("distance_km", opts.myLatestDistance - 0.5)
 		.lte("distance_km", opts.myLatestDistance + 0.5)
-		// Bounded server-side: the desktop dashboard renders one card per match,
-		// so an unbounded result would stretch the page (and cost data).
+		// Bounded server-side so an unbounded result can't stretch the page (or
+		// cost data), but wide enough that the closeness sort below still sees
+		// every plausible candidate — the DB returns no particular order, so
+		// cutting to 12 here would discard closer matches before ranking them.
 		.neq("user_id", opts.userId)
-		.limit(12);
+		.limit(MATCH_CANDIDATE_LIMIT);
 	const rows = (data as unknown as Match[]) ?? [];
 	if (!error) {
 		rows.sort(
@@ -114,5 +120,6 @@ export async function fetchMatches(opts: {
 				Math.abs(b.distance_km - opts.myLatestDistance),
 		);
 	}
-	return { data: error ? null : rows, error };
+	// Rank first, then truncate to what the dashboard renders.
+	return { data: error ? null : rows.slice(0, MATCH_LIMIT), error };
 }
