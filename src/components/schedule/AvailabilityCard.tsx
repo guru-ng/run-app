@@ -78,8 +78,10 @@ export default function AvailabilityCard({
 			<div className="calendar-grid">
 				{cells.map((cell) => {
 					const dayPlans = plansByDate.get(cell.iso) ?? [];
-					// You can't plan a run that's already been and gone. Past days stay
-					// visible (their tooltips still work) but aren't clickable.
+					// You can't plan a run that's already been and gone. Past days use
+					// aria-disabled rather than `disabled` so they stay focusable: a
+					// disabled button is skipped by the keyboard entirely, which would
+					// leave the tooltip listing who ran that day mouse-only.
 					const isPast = cell.iso < today;
 					return (
 						<div className="calendar-day-wrap" key={cell.iso}>
@@ -90,8 +92,11 @@ export default function AvailabilityCard({
 									(dayPlans.length > 0 ? " planned" : "") +
 									(cell.inMonth ? "" : " outside")
 								}
-								disabled={isPast}
-								onClick={() => setModalDate(cell.iso)}
+								aria-disabled={isPast || undefined}
+								onClick={() => {
+									if (isPast) return;
+									setModalDate(cell.iso);
+								}}
 							>
 								{cell.day}
 								{dayPlans.length > 0 && <span className="calendar-dot" />}

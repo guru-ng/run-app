@@ -625,12 +625,14 @@ main {
 }
 
 /* Past days can't be scheduled — see AvailabilityCard. */
-.calendar-day:disabled {
+/* Past days: aria-disabled, not :disabled, so they keep keyboard focus and
+   their "who ran that day" tooltip stays reachable. See AvailabilityCard. */
+.calendar-day[aria-disabled="true"] {
   cursor: default;
   opacity: 0.45;
 }
 
-.calendar-day:disabled:hover {
+.calendar-day[aria-disabled="true"]:hover {
   background: transparent;
 }
 
