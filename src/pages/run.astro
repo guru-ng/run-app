@@ -1,0 +1,14 @@
+---
+import App from "@/components/auth/App.tsx";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+{/*
+	Single logged run, addressed as `/run/?id=<uuid>`. The id rides in the query
+	string so this stays one statically-built page — a `/runs/[id]` path would
+	need an SSR adapter. The run itself is fetched client-side, scoped to the
+	signed-in user.
+*/}
+<BaseLayout title="run — log detail" showBack>
+	<App client:only="react" view="run" />
+</BaseLayout>
