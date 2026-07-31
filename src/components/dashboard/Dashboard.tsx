@@ -47,17 +47,22 @@ export default function Dashboard({
 	const myLatestDistance = runs && runs.length > 0 ? runs[0].distance_km : null;
 
 	function addScheduled(p: PlannedRun) {
-		setAllPlans((prev) => [
-			...(prev ?? []),
-			{
-				id: p.id,
-				planned_date: p.planned_date,
-				time_of_day: p.time_of_day,
-				run_type: p.run_type,
-				user_id: profile.id,
-				display_name: profile.display_name,
-			},
-		]);
+		const entry = {
+			id: p.id,
+			planned_date: p.planned_date,
+			time_of_day: p.time_of_day,
+			run_type: p.run_type,
+			user_id: profile.id,
+			display_name: profile.display_name,
+		};
+		setAllPlans((prev) => {
+			const list = prev ?? [];
+			// Editing a plan returns the same row id — replace it in place rather
+			// than appending a second copy of the same run.
+			return list.some((x) => x.id === entry.id)
+				? list.map((x) => (x.id === entry.id ? entry : x))
+				: [...list, entry];
+		});
 	}
 
 	function removeScheduled(id: string) {

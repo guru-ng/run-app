@@ -50,6 +50,30 @@ export async function insertPlannedRun(input: {
 	return { data: (data as PlannedRun) ?? null, error };
 }
 
+/**
+ * Edit an existing plan in place. Used when the schedule modal is opened on a
+ * day you already have a run planned — a delete-then-insert would briefly drop
+ * the row and hand back a new id, so the update is one atomic statement.
+ */
+export async function updatePlannedRun(input: {
+	id: string;
+	plannedDate: string;
+	timeOfDay: TimeOfDay;
+	runType: RunType;
+}): Promise<ApiResult<PlannedRun>> {
+	const { data, error } = await supabase
+		.from("planned_runs")
+		.update({
+			planned_date: input.plannedDate,
+			time_of_day: input.timeOfDay,
+			run_type: input.runType,
+		})
+		.eq("id", input.id)
+		.select("id, planned_date, time_of_day, run_type")
+		.single();
+	return { data: (data as PlannedRun) ?? null, error };
+}
+
 export async function deletePlannedRun(id: string): Promise<{ error: ApiResult<never>["error"] }> {
 	const { error } = await supabase.from("planned_runs").delete().eq("id", id);
 	return { error };

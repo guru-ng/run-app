@@ -23,14 +23,19 @@ export default function ProfileTab({
 		if (!dirty) return;
 		setSaving(true);
 		setError(null);
-		const { error } = await updateDisplayName(profile.id, trimmed);
-		setSaving(false);
-		if (error) {
-			setError(error.message);
-			return;
+		try {
+			const { error } = await updateDisplayName(profile.id, trimmed);
+			if (error) {
+				setError(error.message);
+				return;
+			}
+			onNameChanged(trimmed);
+			setSaved(true);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Couldn't save your name. Try again.");
+		} finally {
+			setSaving(false);
 		}
-		onNameChanged(trimmed);
-		setSaved(true);
 	}
 
 	return (

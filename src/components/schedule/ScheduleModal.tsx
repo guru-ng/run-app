@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { insertPlannedRun, deletePlannedRun } from "@/lib/api/plannedRuns";
+import { insertPlannedRun, updatePlannedRun, deletePlannedRun } from "@/lib/api/plannedRuns";
+import { todayIso } from "@/lib/dates";
 import type { DayAvailability, PlannedRun, RunType, TimeOfDay } from "@/lib/types";
 
 const TIME_OPTIONS: { value: TimeOfDay; label: string }[] = [
@@ -36,27 +37,39 @@ export default function ScheduleModal({
 	const [error, setError] = useState<string | null>(null);
 
 	async function save() {
-		if (myPlanCount >= MAX_SCHEDULED_RUNS) {
+		// Editing a plan doesn't add one, so the cap only applies to new plans —
+		// otherwise you can't change a run once you're at the limit.
+		if (!existingPlan && myPlanCount >= MAX_SCHEDULED_RUNS) {
 			setError(`You've reached the limit of ${MAX_SCHEDULED_RUNS} scheduled runs.`);
+			return;
+		}
+
+		if (date < todayIso()) {
+			setError("Pick today or a later date.");
 			return;
 		}
 
 		setBusy(true);
 		setError(null);
 
-		const { data, error: insertError } = await insertPlannedRun({
-			userId,
-			plannedDate: date,
-			timeOfDay,
-			runType,
-		});
+		// Update in place when there's already a plan for this day; inserting
+		// would leave the old row behind as a duplicate.
+		const { data, error: saveError } = existingPlan
+			? await updatePlannedRun({
+					id: existingPlan.id,
+					plannedDate: date,
+					timeOfDay,
+					runType,
+				})
+			: await insertPlannedRun({ userId, plannedDate: date, timeOfDay, runType });
 
-		if (insertError) {
-			setError(insertError.message);
+		if (saveError) {
+			setError(saveError.message);
 			setBusy(false);
 			return;
 		}
 
+		setBusy(false);
 		onScheduled(data as PlannedRun);
 	}
 
@@ -73,6 +86,7 @@ export default function ScheduleModal({
 			return;
 		}
 
+		setBusy(false);
 		onCanceled(existingPlan.id);
 	}
 
@@ -107,6 +121,7 @@ export default function ScheduleModal({
 				<input
 					className="input"
 					type="date"
+					min={todayIso()}
 					value={date}
 					onChange={(e) => setDate(e.target.value)}
 				/>

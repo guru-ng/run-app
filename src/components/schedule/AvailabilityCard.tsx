@@ -21,6 +21,7 @@ export default function AvailabilityCard({
 	const [viewedMonth, setViewedMonth] = useState(() => new Date());
 
 	const cells = getMonthGrid(viewedMonth);
+	const today = todayIso();
 
 	const plansByDate = useMemo(() => {
 		const map = new Map<string, DayAvailability[]>();
@@ -77,6 +78,9 @@ export default function AvailabilityCard({
 			<div className="calendar-grid">
 				{cells.map((cell) => {
 					const dayPlans = plansByDate.get(cell.iso) ?? [];
+					// You can't plan a run that's already been and gone. Past days stay
+					// visible (their tooltips still work) but aren't clickable.
+					const isPast = cell.iso < today;
 					return (
 						<div className="calendar-day-wrap" key={cell.iso}>
 							<button
@@ -86,6 +90,7 @@ export default function AvailabilityCard({
 									(dayPlans.length > 0 ? " planned" : "") +
 									(cell.inMonth ? "" : " outside")
 								}
+								disabled={isPast}
 								onClick={() => setModalDate(cell.iso)}
 							>
 								{cell.day}

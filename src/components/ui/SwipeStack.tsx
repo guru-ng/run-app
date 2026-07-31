@@ -36,6 +36,9 @@ export default function SwipeStack({
 	const dragStartY = useRef<number | null>(null);
 	const dragAxis = useRef<"x" | "y" | null>(null);
 	const dragging = useRef(false);
+	// Mirrors dragX synchronously: pointerup can land in the same batch as the
+	// last pointermove, where the dragX state this render closed over is stale.
+	const dragXRef = useRef(0);
 	const exitTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	useEffect(() => {
@@ -62,6 +65,7 @@ export default function SwipeStack({
 		dragStartY.current = e.clientY;
 		dragAxis.current = null;
 		dragging.current = true;
+		dragXRef.current = 0;
 	}
 
 	function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
@@ -81,6 +85,7 @@ export default function SwipeStack({
 
 		if (dragAxis.current !== "x") return;
 		e.preventDefault();
+		dragXRef.current = dx;
 		setDragX(dx);
 	}
 
@@ -99,15 +104,33 @@ export default function SwipeStack({
 		dragStartY.current = null;
 		dragAxis.current = null;
 
-		if (wasHorizontal && Math.abs(dragX) >= SWIPE_THRESHOLD && remaining.length > 0) {
-			flingOut(remaining[0].i, dragX < 0 ? -1 : 1);
+		const finalX = dragXRef.current;
+		if (wasHorizontal && Math.abs(finalX) >= SWIPE_THRESHOLD && remaining.length > 0) {
+			flingOut(remaining[0].i, finalX < 0 ? -1 : 1);
 		} else {
+			dragXRef.current = 0;
 			setDragX(0);
 		}
 	}
 
+	/**
+	 * The browser can revoke a pointer mid-gesture (system gesture, the touch
+	 * turning into a scroll). That's an abort, not a swipe — snap back rather
+	 * than dismissing, and clear the drag refs so the next gesture starts clean.
+	 */
+	function cancelDrag() {
+		if (!dragging.current) return;
+		dragging.current = false;
+		dragStartX.current = null;
+		dragStartY.current = null;
+		dragAxis.current = null;
+		dragXRef.current = 0;
+		setDragX(0);
+	}
+
 	function flingOut(index: number, direction: 1 | -1) {
 		setExiting({ index, direction });
+		dragXRef.current = 0;
 		setDragX(0);
 		exitTimeout.current = setTimeout(() => {
 			setDismissed((prev) => {
@@ -154,6 +177,7 @@ export default function SwipeStack({
 			onPointerMove={onPointerMove}
 			onPointerUp={endDrag}
 			onPointerLeave={endDrag}
+			onPointerCancel={cancelDrag}
 		>
 			<div className="swipe-hint" aria-hidden="true">
 				<span className="swipe-arrow swipe-arrow-left">‹</span>

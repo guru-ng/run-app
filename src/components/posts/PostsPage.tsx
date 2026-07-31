@@ -19,11 +19,29 @@ type UserPosts = {
 export default function PostsPage() {
 	const [ready, setReady] = useState(false);
 	const [byUser, setByUser] = useState<UserPosts[] | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
-	// Real route outside the tab-state island — needs its own auth check.
+	// Real route outside the tab-state island — needs its own auth check, and
+	// the same invite gate App applies: signed in but no profile means the
+	// invite was never redeemed, so bounce to / to go through that flow.
 	useEffect(() => {
-		supabase.auth.getSession().then(({ data }) => {
+		let cancelled = false;
+		supabase.auth.getSession().then(async ({ data }) => {
 			if (!data.session) {
+				window.location.href = "/";
+				return;
+			}
+			const { data: profile, error: profileError } = await supabase
+				.from("profiles")
+				.select("id")
+				.eq("id", data.session.user.id)
+				.maybeSingle();
+			if (cancelled) return;
+			if (profileError) {
+				setError(profileError.message);
+				return;
+			}
+			if (!profile) {
 				window.location.href = "/";
 				return;
 			}
@@ -32,12 +50,21 @@ export default function PostsPage() {
 		const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
 			if (!session) window.location.href = "/";
 		});
-		return () => sub.subscription.unsubscribe();
+		return () => {
+			cancelled = true;
+			sub.subscription.unsubscribe();
+		};
 	}, []);
 
 	useEffect(() => {
 		if (!ready) return;
-		fetchRunsFeed({ limit: 50 }).then(({ data }) => {
+		fetchRunsFeed({ limit: 50 }).then(({ data, error: feedError }) => {
+			// An empty feed and a failed fetch look identical downstream, so bail
+			// before grouping rather than rendering "No runs logged yet."
+			if (feedError) {
+				setError(feedError.message);
+				return;
+			}
 			const rows = data ?? [];
 			const order: string[] = [];
 			const grouped = new Map<string, UserPosts>();
@@ -90,7 +117,22 @@ export default function PostsPage() {
 			(prev) => prev?.map((u) => (u.user_id === userId ? { ...u, loadingMore: true } : u)) ?? null,
 		);
 
-		const { data } = await fetchRunsFeed({ limit: PAGE_SIZE, offset: user.runs.length, userId });
+		const { data, error: feedError } = await fetchRunsFeed({
+			limit: PAGE_SIZE,
+			offset: user.runs.length,
+			userId,
+		});
+
+		// A failed page must not look like the end of the feed — keep hasMore and
+		// page untouched so the button stays live and the user can retry.
+		if (feedError) {
+			setError(feedError.message);
+			setByUser(
+				(prev) =>
+					prev?.map((u) => (u.user_id === userId ? { ...u, loadingMore: false } : u)) ?? null,
+			);
+			return;
+		}
 
 		const rows = data ?? [];
 		setByUser(
@@ -109,11 +151,13 @@ export default function PostsPage() {
 		);
 	}
 
+	if (error && !ready) return <div className="panel"><p className="error">{error}</p></div>;
 	if (!ready) return <div className="panel">Loading…</div>;
 
 	return (
 		<div className="posts-grid">
-			{byUser === null ? (
+			{error && <p className="error">{error}</p>}
+			{byUser === null && error ? null : byUser === null ? (
 				<p className="muted">Loading…</p>
 			) : byUser.length === 0 ? (
 				<p className="muted">No runs logged yet.</p>

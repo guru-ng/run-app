@@ -17,26 +17,38 @@ export default function InviteScreen({
 		setBusy(true);
 		setError(null);
 
-		const { error: rpcError } = await supabase.rpc("redeem_invite", {
-			invite_code: code.trim(),
-			name: name.trim(),
-		});
+		try {
+			const { error: rpcError } = await supabase.rpc("redeem_invite", {
+				invite_code: code.trim(),
+				name: name.trim(),
+			});
 
-		if (rpcError) {
-			const msg =
-				rpcError.message.includes("invalid_invite")
-					? "That invite code isn't valid."
-					: rpcError.message.includes("invite_exhausted")
-						? "That invite code has been used up."
-						: rpcError.message;
-			setError(msg);
+			if (rpcError) {
+				const msg =
+					rpcError.message.includes("invalid_invite")
+						? "That invite code isn't valid."
+						: rpcError.message.includes("invite_exhausted")
+							? "That invite code has been used up."
+							: rpcError.message;
+				setError(msg);
+				return;
+			}
+
+			const { data: userData, error: userError } = await supabase.auth.getUser();
+			const id = userData?.user?.id;
+			// The invite was redeemed, but without an id there's no profile to hand
+			// back — say so rather than calling onRedeemed with `undefined`.
+			if (userError || !id) {
+				setError(userError?.message ?? "Your invite was accepted, but we couldn't load your account. Try reloading.");
+				return;
+			}
+
+			onRedeemed({ id, display_name: name.trim() || "Runner" });
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
+		} finally {
 			setBusy(false);
-			return;
 		}
-
-		const { data: userData } = await supabase.auth.getUser();
-		const id = userData.user?.id as string;
-		onRedeemed({ id, display_name: name.trim() || "Runner" });
 	}
 
 	async function signOut() {

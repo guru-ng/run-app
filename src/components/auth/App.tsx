@@ -8,7 +8,7 @@ import Dashboard from "@/components/dashboard/Dashboard";
 import RunPage from "@/components/runs/RunPage";
 import type { TabId } from "@/components/ui/navItems";
 
-type Phase = "loading" | "signed-out" | "needs-invite" | "ready";
+type Phase = "loading" | "signed-out" | "needs-invite" | "ready" | "error";
 
 /**
  * Every signed-in page mounts this island: it owns the session/profile check
@@ -54,20 +54,30 @@ export default function App({ tab = "dashboard", view = "app" }: AppProps) {
 
 function AppInner({ tab, view }: Required<AppProps>) {
 	const [session, setSession] = useState<Session | null>(null);
+	// `session === null` means both "not checked yet" and "signed out", so track
+	// the check separately — otherwise the starting null reads as signed-out and
+	// flashes LoginScreen at an already-authenticated user.
+	const [sessionChecked, setSessionChecked] = useState(false);
 	const [profile, setProfile] = useState<Profile | null>(null);
 	const [phase, setPhase] = useState<Phase>("loading");
+	const [loadError, setLoadError] = useState<string | null>(null);
 
 	// Track auth session.
 	useEffect(() => {
-		supabase.auth.getSession().then(({ data }) => setSession(data.session));
+		supabase.auth.getSession().then(({ data }) => {
+			setSession(data.session);
+			setSessionChecked(true);
+		});
 		const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
 			setSession(s);
+			setSessionChecked(true);
 		});
 		return () => sub.subscription.unsubscribe();
 	}, []);
 
 	// When the session changes, look up the user's profile.
 	useEffect(() => {
+		if (!sessionChecked) return;
 		if (!session) {
 			setProfile(null);
 			setPhase("signed-out");
@@ -79,7 +89,14 @@ function AppInner({ tab, view }: Required<AppProps>) {
 			.select("id, display_name")
 			.eq("id", session.user.id)
 			.maybeSingle()
-			.then(({ data }) => {
+			.then(({ data, error }) => {
+				// A failed lookup is not the same as "no profile" — sending a real
+				// member to the invite screen would be worse than showing the error.
+				if (error) {
+					setLoadError(error.message);
+					setPhase("error");
+					return;
+				}
 				if (data) {
 					setProfile(data as Profile);
 					setPhase("ready");
@@ -87,9 +104,16 @@ function AppInner({ tab, view }: Required<AppProps>) {
 					setPhase("needs-invite");
 				}
 			});
-	}, [session]);
+	}, [session, sessionChecked]);
 
 	if (phase === "loading") return <Centered>Loading…</Centered>;
+	if (phase === "error")
+		return (
+			<div className="panel">
+				<h1 className="brand-title">Couldn't load your profile</h1>
+				<p className="error">{loadError}</p>
+			</div>
+		);
 	if (phase === "signed-out") return <LoginScreen />;
 	if (phase === "needs-invite")
 		return (

@@ -62,18 +62,20 @@ export function useRunsFeedPaginated(pageSize: number) {
 		}
 
 		setLoadingMore(true);
-		const { data, error } = await fetchRunsFeed({ limit: pageSize, offset: feed.length });
-		if (error) {
-			setError(error);
-			setLoadingMore(false);
-			return;
-		}
+		try {
+			const { data, error } = await fetchRunsFeed({ limit: pageSize, offset: feed.length });
+			if (error) {
+				setError(error);
+				return;
+			}
 
-		const rows = data ?? [];
-		setFeed((prev) => [...(prev ?? []), ...rows]);
-		setHasMore(rows.length === pageSize);
-		if (rows.length > 0) setPage(nextPage);
-		setLoadingMore(false);
+			const rows = data ?? [];
+			setFeed((prev) => [...(prev ?? []), ...rows]);
+			setHasMore(rows.length === pageSize);
+			if (rows.length > 0) setPage(nextPage);
+		} finally {
+			setLoadingMore(false);
+		}
 	}
 
 	const pageFeed = (feed ?? []).slice(page * pageSize, page * pageSize + pageSize);

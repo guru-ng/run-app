@@ -6,12 +6,19 @@ export default function LoginScreen() {
 
 	async function signInWithGoogle() {
 		setBusy(true);
-		const { error } = await supabase.auth.signInWithOAuth({
-			provider: "google",
-			options: { redirectTo: window.location.origin },
-		});
-		if (error) {
-			alert(error.message);
+		try {
+			const { error } = await supabase.auth.signInWithOAuth({
+				provider: "google",
+				options: { redirectTo: window.location.origin },
+			});
+			if (error) {
+				alert(error.message);
+				setBusy(false);
+			}
+			// No reset on success: the browser is navigating away, so the button
+			// should stay in its "Redirecting…" state until it does.
+		} catch (err) {
+			alert(err instanceof Error ? err.message : "Couldn't start sign-in. Try again.");
 			setBusy(false);
 		}
 	}

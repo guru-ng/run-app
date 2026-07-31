@@ -612,6 +612,16 @@ main {
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* Past days can't be scheduled — see AvailabilityCard. */
+.calendar-day:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.calendar-day:disabled:hover {
+  background: transparent;
+}
+
 .calendar-day.outside {
   color: rgba(232, 239, 233, 0.25);
 }

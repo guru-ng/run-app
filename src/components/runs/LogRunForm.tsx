@@ -21,23 +21,27 @@ export default function LogRunForm({
 		setBusy(true);
 		setError(null);
 
-		const { data, error: insertError } = await insertRun({
-			userId,
-			distanceKm: Number(distanceKm),
-			runDate,
-			notes: notes.trim() || null,
-		});
+		try {
+			const { data, error: insertError } = await insertRun({
+				userId,
+				distanceKm: Number(distanceKm),
+				runDate,
+				notes: notes.trim() || null,
+			});
 
-		if (insertError) {
-			setError(insertError.message);
+			if (insertError) {
+				setError(insertError.message);
+				return;
+			}
+
+			onLogged(data as Run);
+			setDistanceKm("");
+			setNotes("");
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Couldn't log that run. Try again.");
+		} finally {
 			setBusy(false);
-			return;
 		}
-
-		onLogged(data as Run);
-		setDistanceKm("");
-		setNotes("");
-		setBusy(false);
 	}
 
 	return (
