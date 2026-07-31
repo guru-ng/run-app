@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { PlannedRun, Profile, Run } from "@/lib/types";
 import { useOwnRuns } from "@/lib/hooks/useOwnRuns";
@@ -35,6 +35,13 @@ export default function Dashboard({
 	// firing a second round of queries after mount.
 	const isMobile = useIsMobile();
 	const [activeTab, setActiveTab] = useState<TabId>(tab);
+
+	// The island is persisted across client-side navigations, so `tab` can change
+	// without a remount and mobile's local tab state has to follow it. Mobile
+	// never navigates between rail pages, so in practice this is a no-op there.
+	useEffect(() => {
+		setActiveTab(tab);
+	}, [tab]);
 
 	// Mobile holds every tab in one page, so it needs both queries. Desktop only
 	// loads what the current page actually renders.

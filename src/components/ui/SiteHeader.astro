@@ -51,11 +51,22 @@ const { showBack = false } = Astro.props;
 <script is:inline>
 	(function () {
 		var root = document.documentElement;
-		var stored = localStorage.getItem("theme");
-		var theme =
-			stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-		root.dataset.theme = theme;
 
+		function applyTheme() {
+			var stored = localStorage.getItem("theme");
+			root.dataset.theme =
+				stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+		}
+
+		applyTheme();
+
+		// ClientRouter replaces <html>'s attributes with the incoming document's,
+		// and data-theme only exists at runtime — so without this the page reverts
+		// to the default theme on every client-side navigation.
+		document.addEventListener("astro:after-swap", applyTheme);
+
+		// Delegated on document (which survives swaps); this script runs only once,
+		// so the listener is never registered twice.
 		document.addEventListener("click", function (e) {
 			var btn = e.target.closest("#theme-toggle");
 			if (!btn) return;

@@ -1,5 +1,6 @@
 ---
 import "@/styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import SiteHeader from "@/components/ui/SiteHeader.astro";
 
 interface Props {
@@ -26,6 +27,12 @@ const { title, description, showBack = false } = Astro.props;
 			rel="stylesheet"
 		/>
 		<title>{title}</title>
+		{/*
+			Client-side routing: the four rail destinations swap the DOM instead of
+			reloading the document, and the App island is marked transition:persist
+			on each of them so the session/profile check doesn't re-run per click.
+		*/}
+		<ClientRouter />
 	</head>
 	<body>
 		<main>

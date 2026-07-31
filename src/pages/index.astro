@@ -7,7 +7,7 @@ const description =
 ---
 
 <BaseLayout title="run" description={description}>
-	<App client:only="react" tab="dashboard" />
+	<App client:only="react" tab="dashboard" transition:persist="app" />
 	<footer>
 		<span>An experiment by <a href="https://snjv.club">Sanjeev Gurung</a></span>
 	</footer>
