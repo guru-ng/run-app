@@ -91,35 +91,63 @@ export async function fetchRunsFeed(opts: {
 	return { data: error ? null : rows.map(mapFeedRow), error };
 }
 
-/** How many candidates to rank, and how many of those to actually return. */
-const MATCH_CANDIDATE_LIMIT = 200;
+/** How many matches the dashboard shows. */
 const MATCH_LIMIT = 12;
 
-/** Others within +/-0.5km of `myLatestDistance`, logged this week, closest first. */
+/**
+ * Others within +/-0.5km of `myLatestDistance`, logged this week, closest first.
+ *
+ * "Closest" can't be ordered in a single query: PostgREST's `order` takes a
+ * column, not an expression, so there's no `abs(distance_km - target)` to sort
+ * by without a database function. A single capped query would therefore hand
+ * back an arbitrary slice of the band and rank only that.
+ *
+ * Instead, take the nearest MATCH_LIMIT strictly below the target and the
+ * nearest MATCH_LIMIT at or above it — each ordered in the database, so each is
+ * deterministic — then merge and rank. Any of the true closest MATCH_LIMIT has
+ * to be in that union, and it transfers at most 2 x MATCH_LIMIT rows, well
+ * under the old candidate pool. The two bands don't overlap, which matters
+ * because a match row has no id to de-duplicate on.
+ */
 export async function fetchMatches(opts: {
 	userId: string;
 	myLatestDistance: number;
 }): Promise<ApiResult<Match[]>> {
-	const { data, error } = await supabase
-		.from("runs")
-		.select("distance_km, run_date, profiles(display_name)")
-		.gte("run_date", startOfWeekIso())
-		.gte("distance_km", opts.myLatestDistance - 0.5)
-		.lte("distance_km", opts.myLatestDistance + 0.5)
-		// Bounded server-side so an unbounded result can't stretch the page (or
-		// cost data), but wide enough that the closeness sort below still sees
-		// every plausible candidate — the DB returns no particular order, so
-		// cutting to 12 here would discard closer matches before ranking them.
-		.neq("user_id", opts.userId)
-		.limit(MATCH_CANDIDATE_LIMIT);
-	const rows = (data as unknown as Match[]) ?? [];
-	if (!error) {
-		rows.sort(
-			(a, b) =>
-				Math.abs(a.distance_km - opts.myLatestDistance) -
-				Math.abs(b.distance_km - opts.myLatestDistance),
-		);
-	}
+	const weekStart = startOfWeekIso();
+	const inRangeThisWeek = () =>
+		supabase
+			.from("runs")
+			.select("distance_km, run_date, profiles(display_name)")
+			.gte("run_date", weekStart)
+			.neq("user_id", opts.userId);
+
+	const [below, above] = await Promise.all([
+		// [target - 0.5, target) — descending, so the closest come first.
+		inRangeThisWeek()
+			.gte("distance_km", opts.myLatestDistance - 0.5)
+			.lt("distance_km", opts.myLatestDistance)
+			.order("distance_km", { ascending: false })
+			.limit(MATCH_LIMIT),
+		// [target, target + 0.5] — ascending, likewise.
+		inRangeThisWeek()
+			.gte("distance_km", opts.myLatestDistance)
+			.lte("distance_km", opts.myLatestDistance + 0.5)
+			.order("distance_km", { ascending: true })
+			.limit(MATCH_LIMIT),
+	]);
+
+	const error = below.error ?? above.error;
+	if (error) return { data: null, error };
+
+	const rows = [
+		...((below.data as unknown as Match[]) ?? []),
+		...((above.data as unknown as Match[]) ?? []),
+	];
+	rows.sort(
+		(a, b) =>
+			Math.abs(a.distance_km - opts.myLatestDistance) -
+			Math.abs(b.distance_km - opts.myLatestDistance),
+	);
 	// Rank first, then truncate to what the dashboard renders.
-	return { data: error ? null : rows.slice(0, MATCH_LIMIT), error };
+	return { data: rows.slice(0, MATCH_LIMIT), error: null };
 }
