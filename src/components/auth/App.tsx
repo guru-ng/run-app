@@ -2,11 +2,20 @@ import type { Session } from "@supabase/supabase-js";
 import { Component, type ReactNode, useEffect, useState } from "react";
 import { configError, supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/types";
-import LoginScreen from "@/components/LoginScreen";
-import InviteScreen from "@/components/InviteScreen";
-import Dashboard from "@/components/Dashboard";
+import LoginScreen from "@/components/auth/LoginScreen";
+import InviteScreen from "@/components/auth/InviteScreen";
+import Dashboard from "@/components/dashboard/Dashboard";
+import RunPage from "@/components/runs/RunPage";
+import type { TabId } from "@/components/ui/navItems";
 
 type Phase = "loading" | "signed-out" | "needs-invite" | "ready";
+
+/**
+ * Every signed-in page mounts this island: it owns the session/profile check
+ * and then hands off to whatever the page is. `tab` says which destination the
+ * URL stands for; `view: "run"` is the single-run detail page instead.
+ */
+export type AppProps = { tab?: TabId; view?: "app" | "run" };
 
 // Catches any render/runtime error and shows it on the page instead of a blank screen.
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -27,7 +36,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
 	}
 }
 
-export default function App() {
+export default function App({ tab = "dashboard", view = "app" }: AppProps) {
 	if (configError) {
 		return (
 			<div className="panel">
@@ -38,12 +47,12 @@ export default function App() {
 	}
 	return (
 		<ErrorBoundary>
-			<AppInner />
+			<AppInner tab={tab} view={view} />
 		</ErrorBoundary>
 	);
 }
 
-function AppInner() {
+function AppInner({ tab, view }: Required<AppProps>) {
 	const [session, setSession] = useState<Session | null>(null);
 	const [profile, setProfile] = useState<Profile | null>(null);
 	const [phase, setPhase] = useState<Phase>("loading");
@@ -92,9 +101,12 @@ function AppInner() {
 			/>
 		);
 
+	if (view === "run") return <RunPage userId={(profile as Profile).id} />;
+
 	return (
 		<Dashboard
 			profile={profile as Profile}
+			tab={tab}
 			onProfileChanged={(name) =>
 				setProfile((p) => (p ? { ...p, display_name: name } : p))
 			}

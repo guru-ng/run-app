@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { updateDisplayName } from "@/lib/api/profiles";
 import type { Profile } from "@/lib/types";
 
 export default function ProfileTab({
@@ -23,10 +23,7 @@ export default function ProfileTab({
 		if (!dirty) return;
 		setSaving(true);
 		setError(null);
-		const { error } = await supabase
-			.from("profiles")
-			.update({ display_name: trimmed })
-			.eq("id", profile.id);
+		const { error } = await updateDisplayName(profile.id, trimmed);
 		setSaving(false);
 		if (error) {
 			setError(error.message);

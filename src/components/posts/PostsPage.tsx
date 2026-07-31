@@ -1,19 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { fetchRunsFeed } from "@/lib/api/runs";
 import type { FeedRun } from "@/lib/types";
 import { shortDateLabel } from "@/lib/dates";
-import SwipeStack from "@/components/SwipeStack";
+import SwipeStack from "@/components/ui/SwipeStack";
 
 const PAGE_SIZE = 3;
-
-type FeedRow = {
-	id: string;
-	distance_km: number;
-	run_date: string;
-	notes: string | null;
-	user_id: string;
-	profiles: { display_name: string } | null;
-};
 
 type UserPosts = {
 	user_id: string;
@@ -23,17 +15,6 @@ type UserPosts = {
 	loadingMore: boolean;
 	hasMore: boolean;
 };
-
-function mapRow(r: FeedRow): FeedRun {
-	return {
-		id: r.id,
-		distance_km: r.distance_km,
-		run_date: r.run_date,
-		notes: r.notes,
-		user_id: r.user_id,
-		display_name: r.profiles?.display_name ?? "Runner",
-	};
-}
 
 export default function PostsPage() {
 	const [ready, setReady] = useState(false);
@@ -56,32 +37,26 @@ export default function PostsPage() {
 
 	useEffect(() => {
 		if (!ready) return;
-		supabase
-			.from("runs")
-			.select("id, distance_km, run_date, notes, user_id, profiles(display_name)")
-			.order("run_date", { ascending: false })
-			.order("created_at", { ascending: false })
-			.limit(50)
-			.then(({ data }) => {
-				const rows = (data as unknown as FeedRow[]) ?? [];
-				const order: string[] = [];
-				const grouped = new Map<string, UserPosts>();
-				for (const r of rows) {
-					if (!grouped.has(r.user_id)) {
-						grouped.set(r.user_id, {
-							user_id: r.user_id,
-							display_name: r.profiles?.display_name ?? "Runner",
-							runs: [],
-							page: 0,
-							loadingMore: false,
-							hasMore: true,
-						});
-						order.push(r.user_id);
-					}
-					grouped.get(r.user_id)!.runs.push(mapRow(r));
+		fetchRunsFeed({ limit: 50 }).then(({ data }) => {
+			const rows = data ?? [];
+			const order: string[] = [];
+			const grouped = new Map<string, UserPosts>();
+			for (const r of rows) {
+				if (!grouped.has(r.user_id)) {
+					grouped.set(r.user_id, {
+						user_id: r.user_id,
+						display_name: r.display_name,
+						runs: [],
+						page: 0,
+						loadingMore: false,
+						hasMore: true,
+					});
+					order.push(r.user_id);
 				}
-				setByUser(order.map((id) => grouped.get(id)!));
-			});
+				grouped.get(r.user_id)!.runs.push(r);
+			}
+			setByUser(order.map((id) => grouped.get(id)!));
+		});
 	}, [ready]);
 
 	function hasNextPage(user: UserPosts) {
@@ -115,22 +90,16 @@ export default function PostsPage() {
 			(prev) => prev?.map((u) => (u.user_id === userId ? { ...u, loadingMore: true } : u)) ?? null,
 		);
 
-		const { data } = await supabase
-			.from("runs")
-			.select("id, distance_km, run_date, notes, user_id, profiles(display_name)")
-			.eq("user_id", userId)
-			.order("run_date", { ascending: false })
-			.order("created_at", { ascending: false })
-			.range(user.runs.length, user.runs.length + PAGE_SIZE - 1);
+		const { data } = await fetchRunsFeed({ limit: PAGE_SIZE, offset: user.runs.length, userId });
 
-		const rows = (data as unknown as FeedRow[]) ?? [];
+		const rows = data ?? [];
 		setByUser(
 			(prev) =>
 				prev?.map((u) =>
 					u.user_id === userId
 						? {
 								...u,
-								runs: [...u.runs, ...rows.map(mapRow)],
+								runs: [...u.runs, ...rows],
 								page: rows.length > 0 ? nextPage : u.page,
 								loadingMore: false,
 								hasMore: rows.length === PAGE_SIZE,

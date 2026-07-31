@@ -1,7 +1,7 @@
 import type { DayAvailability, Run } from "@/lib/types";
-import InsightsDeck from "@/components/InsightsDeck";
-import RecentActivityDeck from "@/components/RecentActivityDeck";
-import MatchesDeck from "@/components/MatchesDeck";
+import InsightsDeck from "@/components/dashboard/InsightsDeck";
+import RecentActivityDeck from "@/components/runs/RecentActivityDeck";
+import MatchesDeck from "@/components/matches/MatchesDeck";
 
 export default function DashboardTab({
 	userId,

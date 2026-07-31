@@ -65,6 +65,47 @@ main {
   align-items: center;
 }
 
+/* Line the header up with the wider desktop app shell below it. */
+@media (min-width: 641px) {
+  .site-header {
+    max-width: 57rem;
+  }
+
+  /* main centres its children vertically, which on desktop can push the top of
+     a tall page above the scroll origin where it can't be reached. */
+  main {
+    justify-content: flex-start;
+  }
+}
+
+/* Between the mobile breakpoint and ~976px the 57rem shell doesn't fit, so the
+   rail collapses to icons instead of squeezing the content column. This is
+   presentation only — STACK_BREAKPOINT (640px), which defines "mobile" for the
+   swipe decks and the bottom tab bar, is untouched. */
+@media (min-width: 641px) and (max-width: 60rem) {
+  main {
+    padding: 2rem 1rem;
+  }
+
+  .app-shell {
+    grid-template-columns: 3.5rem minmax(0, 44rem);
+    gap: 1rem;
+  }
+
+  .side-nav-link {
+    justify-content: center;
+    padding: 0.55rem;
+  }
+
+  .side-nav-link span:not(.side-nav-icon) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
 .site-header-left {
   justify-self: start;
 }
@@ -154,10 +195,58 @@ main {
 
 /* Mobile tab panels (Log/Schedule/Profile) match the deck-card/post-card
    width so nothing jumps in size when swiping between dashboard tabs —
-   scoped here rather than on .panel itself, which desktop also uses. */
-.tab-panel {
-  max-width: 20rem;
-  min-height: 536.9px;
+   scoped here rather than on .panel itself, which desktop also uses. Desktop
+   now renders these same components as full pages, so the phone-sized cap is
+   mobile-only. */
+@media (max-width: 640px) {
+  .tab-panel {
+    max-width: 20rem;
+    min-height: 536.9px;
+  }
+}
+
+/* On desktop these panels sit inside the left-aligned app shell and fill its
+   44rem column, so the content box is the same width on every page (.panel's
+   26rem cap would otherwise make Log/Schedule/Profile narrower than the
+   Dashboard). Inner controls keep a readable measure instead. Mobile keeps its
+   centered card look untouched. */
+@media (min-width: 641px) {
+  .tab-panel {
+    text-align: left;
+    max-width: none;
+  }
+
+  .tab-panel .form,
+  .tab-panel .runs-list,
+  .tab-panel .calendar-grid,
+  .tab-panel .calendar-month-nav {
+    max-width: 26rem;
+  }
+
+  .tab-panel .deck-card {
+    max-width: none;
+  }
+
+  /* Upcoming plans are a scrolling list on desktop (they're an unbounded deck
+     on mobile, which is untouched) — otherwise the page grows with the data. */
+  .tab-panel .deck-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 15rem;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+
+  /* Calendar and Upcoming sit side by side on desktop: it uses the 44rem the
+     column now has, and keeps the page inside the fixed 34rem box instead of
+     stacking to ~37rem. Mobile keeps them stacked. */
+  .schedule-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
 }
 
 .brand-title {
@@ -196,6 +285,19 @@ main {
 .input:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+/* Keyboard focus was only ever the UA default (and removed outright on
+   .input), which the desktop nav made obvious. Pointer clicks stay ring-free. */
+:where(.side-nav-link, .run-item-link, .btn, .link, .page-nav-btn, .calendar-day, .tab-bar-btn):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .btn {
@@ -243,6 +345,9 @@ main {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  /* Floor as well as ceiling: these lists page 3 rows but render a single
+     "Loading…" line first, which would otherwise resize the panel on load. */
+  min-height: 8.5rem;
   max-height: 16rem;
   overflow-y: auto;
 }
@@ -261,6 +366,37 @@ main {
   background: rgba(0, 0, 0, 0.03);
 }
 
+/* Your own run rows link to their detail page (/run/?id=…). */
+.run-item-link {
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.run-item-link:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.run-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.run-detail-metric {
+  font-size: 2.4rem;
+}
+
+.run-detail-notes {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 .run-item span:last-child {
   text-align: right;
   overflow: hidden;
@@ -268,13 +404,126 @@ main {
   white-space: nowrap;
 }
 
-.dashboard-columns {
-  display: flex;
-  flex-wrap: wrap;
+/* Desktop app shell: left nav rail + the current page's content. Mobile never
+   renders this — it gets the bottom tab bar and .tab-content instead. */
+/* The content column is a fixed 44rem and the rail a fixed 11rem, so the page
+   box is exactly the same size on Dashboard / Log / Schedule / Profile —
+   switching pages moves nothing. Mobile does the same thing with
+   .tab-panel's max-width + min-height. */
+.app-shell {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 44rem);
   justify-content: center;
-  align-items: stretch;
-  gap: 1.5rem;
+  gap: 2rem;
   width: 100%;
+  max-width: 57rem;
+  margin: 0 auto;
+  text-align: left;
+  align-items: start;
+}
+
+/* Fixed height, not min-height: the box must be the same on every page, and a
+   floor alone still lets the Dashboard and Schedule grow with the data. The
+   variable regions (runs lists, matches, upcoming plans) are capped and scroll
+   internally instead. No overflow on .app-main itself — it would clip the
+   calendar tooltip, which is positioned above its cell. */
+.app-main {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  min-width: 0;
+  height: 34rem;
+}
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.side-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.side-nav-link:hover {
+  color: var(--accent);
+  background: var(--panel);
+}
+
+.side-nav-link-active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.side-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+/* Desktop dashboard page: insight cards across the top, then the two
+   site-wide panels side by side. */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-greeting {
+  font-size: 1.6rem;
+}
+
+.insights-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+}
+
+.insights-row .deck-card {
+  max-width: none;
+  /* .panel's 2rem inset leaves too little room at ~13rem wide. */
+  padding: 1.25rem;
+}
+
+.dashboard-grid-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.dashboard-grid-row .deck-card {
+  max-width: none;
+}
+
+.dashboard-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Matches are unbounded (one card per person within range this week), so the
+   column scrolls rather than stretching the page. */
+.dashboard-grid-row .deck-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 17rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .side-panel {
@@ -317,6 +566,13 @@ main {
   margin-bottom: 0.25rem;
 }
 
+/* Months span 4–6 week rows, so reserve the tallest — paging prev/next must
+   not resize the page either. (The weekday header row is exempt.) */
+.calendar-grid:not(.calendar-weekdays) {
+  min-height: 13.25rem;
+  align-content: start;
+}
+
 .calendar-weekday {
   font-size: 0.7rem;
   color: var(--muted);
@@ -340,6 +596,16 @@ main {
   background: transparent;
   color: var(--fg);
   cursor: pointer;
+}
+
+/* The white-alpha hovers below are invisible on the light theme — pre-existing,
+   but the desktop pages surface them a lot more. Dark stays exactly as it was. */
+:root[data-theme="light"] .back-arrow:hover,
+:root[data-theme="light"] .theme-toggle:hover,
+:root[data-theme="light"] .calendar-day:hover,
+:root[data-theme="light"] .btn-secondary:hover,
+:root[data-theme="light"] .page-nav-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .calendar-day:hover {
@@ -395,7 +661,8 @@ main {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.calendar-day-wrap:hover .calendar-tooltip {
+.calendar-day-wrap:hover .calendar-tooltip,
+.calendar-day-wrap:focus-within .calendar-tooltip {
   display: block;
 }
 
@@ -415,7 +682,10 @@ main {
   cursor: pointer;
   font-size: 0.85rem;
   line-height: 1;
-  padding: 0.15rem;
+  /* 24px minimum target (WCAG 2.5.8) — it was ~17px. */
+  padding: 0.4rem;
+  min-width: 24px;
+  min-height: 24px;
   opacity: 0.7;
   margin-left: auto;
 }
@@ -712,10 +982,22 @@ main {
 }
 
 /* Bottom tab bar — mobile-only navigation shell for the dashboard
-   (see CLAUDE.md, "Deck architecture"). Desktop keeps the plain
-   multi-column layout instead, no tabs. */
+   (see CLAUDE.md, "Deck architecture"). Desktop shows the same four
+   destinations in the .side-nav rail instead, one real page each. */
 .tab-bar {
   display: none;
+}
+
+@media (max-width: 640px) {
+  /* Belt and braces: the rail is only rendered on desktop, but if a window is
+     resized down mid-session it should never sit above the tab bar. */
+  .side-nav {
+    display: none;
+  }
+
+  .app-shell {
+    display: block;
+  }
 }
 
 .tab-content {

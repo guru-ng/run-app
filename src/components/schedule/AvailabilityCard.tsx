@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import type { DayAvailability, PlannedRun } from "@/lib/types";
 import { addMonths, getMonthGrid, todayIso } from "@/lib/dates";
-import ScheduleModal from "@/components/ScheduleModal";
+import { usePlannedRunActions } from "@/lib/hooks/usePlannedRunActions";
+import ScheduleModal from "@/components/schedule/ScheduleModal";
 
 const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -32,14 +32,7 @@ export default function AvailabilityCard({
 		return map;
 	}, [allPlans]);
 
-	async function cancelPlan(id: string) {
-		const { error } = await supabase.from("planned_runs").delete().eq("id", id);
-		if (error) {
-			alert(error.message);
-			return;
-		}
-		onCanceled(id);
-	}
+	const { cancelPlan } = usePlannedRunActions(onCanceled);
 
 	const modalDayPlans = modalDate ? (plansByDate.get(modalDate) ?? []) : [];
 	const myExistingPlan = modalDayPlans.find((p) => p.user_id === userId) ?? null;

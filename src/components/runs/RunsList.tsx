@@ -51,12 +51,14 @@ export default function RunsList({ runs }: { runs: Run[] | null }) {
 				</div>
 			</div>
 			<div className="runs-list">
+				{/* Only your own runs get a detail page — feed rows elsewhere on the
+				    site stay non-clickable. */}
 				{pageRuns.map((run) => (
-					<div className="run-item" key={run.id}>
+					<a className="run-item run-item-link" key={run.id} href={`/run/?id=${run.id}`}>
 						<span>{run.run_date}</span>
 						<span>{run.distance_km} km</span>
 						{run.notes && <span className="muted">{run.notes}</span>}
-					</div>
+					</a>
 				))}
 			</div>
 		</div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { insertRun } from "@/lib/api/runs";
 import type { Run } from "@/lib/types";
 import { todayIso } from "@/lib/dates";
 
@@ -21,16 +21,12 @@ export default function LogRunForm({
 		setBusy(true);
 		setError(null);
 
-		const { data, error: insertError } = await supabase
-			.from("runs")
-			.insert({
-				user_id: userId,
-				distance_km: Number(distanceKm),
-				run_date: runDate,
-				notes: notes.trim() || null,
-			})
-			.select("id, distance_km, run_date, notes")
-			.single();
+		const { data, error: insertError } = await insertRun({
+			userId,
+			distanceKm: Number(distanceKm),
+			runDate,
+			notes: notes.trim() || null,
+		});
 
 		if (insertError) {
 			setError(insertError.message);

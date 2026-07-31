@@ -1,7 +1,7 @@
-import { supabase } from "@/lib/supabase";
 import type { DayAvailability } from "@/lib/types";
 import { shortDateLabel, todayIso } from "@/lib/dates";
-import SwipeStack from "@/components/SwipeStack";
+import { usePlannedRunActions } from "@/lib/hooks/usePlannedRunActions";
+import SwipeStack from "@/components/ui/SwipeStack";
 
 export default function UpcomingRunsDeck({
 	userId,
@@ -17,14 +17,7 @@ export default function UpcomingRunsDeck({
 		.filter((p) => p.planned_date >= today)
 		.sort((a, b) => a.planned_date.localeCompare(b.planned_date));
 
-	async function cancelPlan(id: string) {
-		const { error } = await supabase.from("planned_runs").delete().eq("id", id);
-		if (error) {
-			alert(error.message);
-			return;
-		}
-		onCanceled(id);
-	}
+	const { cancelPlan } = usePlannedRunActions(onCanceled);
 
 	return (
 		<div className="deck-section">

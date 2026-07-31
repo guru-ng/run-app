@@ -1,0 +1,8 @@
+---
+import App from "@/components/auth/App.tsx";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="run — schedule">
+	<App client:only="react" tab="schedule" />
+</BaseLayout>

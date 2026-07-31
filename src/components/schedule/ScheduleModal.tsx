@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { insertPlannedRun, deletePlannedRun } from "@/lib/api/plannedRuns";
 import type { DayAvailability, PlannedRun, RunType, TimeOfDay } from "@/lib/types";
 
 const TIME_OPTIONS: { value: TimeOfDay; label: string }[] = [
@@ -44,16 +44,12 @@ export default function ScheduleModal({
 		setBusy(true);
 		setError(null);
 
-		const { data, error: insertError } = await supabase
-			.from("planned_runs")
-			.insert({
-				user_id: userId,
-				planned_date: date,
-				time_of_day: timeOfDay,
-				run_type: runType,
-			})
-			.select("id, planned_date, time_of_day, run_type")
-			.single();
+		const { data, error: insertError } = await insertPlannedRun({
+			userId,
+			plannedDate: date,
+			timeOfDay,
+			runType,
+		});
 
 		if (insertError) {
 			setError(insertError.message);
@@ -69,10 +65,7 @@ export default function ScheduleModal({
 		setBusy(true);
 		setError(null);
 
-		const { error: deleteError } = await supabase
-			.from("planned_runs")
-			.delete()
-			.eq("id", existingPlan.id);
+		const { error: deleteError } = await deletePlannedRun(existingPlan.id);
 
 		if (deleteError) {
 			setError(deleteError.message);

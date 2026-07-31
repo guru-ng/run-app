@@ -45,36 +45,14 @@ const ICONS: Record<TabId, JSX.Element> = {
 	),
 };
 
-const TABS: { id: TabId; label: string }[] = [
-	{ id: "dashboard", label: "Dashboard" },
-	{ id: "log", label: "Log" },
-	{ id: "schedule", label: "Schedule" },
-	{ id: "profile", label: "Profile" },
+/**
+ * The four main destinations, shared by the mobile bottom TabBar and the
+ * desktop SideNav. `href` is the real page URL — desktop navigates to it,
+ * mobile switches tabs in-place (local state, no page load) instead.
+ */
+export const NAV_ITEMS: { id: TabId; label: string; href: string; icon: JSX.Element }[] = [
+	{ id: "dashboard", label: "Dashboard", href: "/", icon: ICONS.dashboard },
+	{ id: "log", label: "Log", href: "/log/", icon: ICONS.log },
+	{ id: "schedule", label: "Schedule", href: "/schedule/", icon: ICONS.schedule },
+	{ id: "profile", label: "Profile", href: "/profile/", icon: ICONS.profile },
 ];
-
-export default function TabBar({
-	active,
-	onChange,
-}: {
-	active: TabId;
-	onChange: (tab: TabId) => void;
-}) {
-	return (
-		<nav className="tab-bar" aria-label="Main">
-			{TABS.map((tab) => (
-				<button
-					key={tab.id}
-					type="button"
-					className={"tab-bar-btn" + (active === tab.id ? " tab-bar-btn-active" : "")}
-					onClick={() => onChange(tab.id)}
-					aria-current={active === tab.id ? "page" : undefined}
-				>
-					<span className="tab-bar-icon" aria-hidden="true">
-						{ICONS[tab.id]}
-					</span>
-					<span className="tab-bar-label">{tab.label}</span>
-				</button>
-			))}
-		</nav>
-	);
-}

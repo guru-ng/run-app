@@ -1,6 +1,6 @@
 import type { DayAvailability, PlannedRun } from "@/lib/types";
-import AvailabilityCard from "@/components/AvailabilityCard";
-import UpcomingRunsDeck from "@/components/UpcomingRunsDeck";
+import AvailabilityCard from "@/components/schedule/AvailabilityCard";
+import UpcomingRunsDeck from "@/components/schedule/UpcomingRunsDeck";
 
 export default function ScheduleTab({
 	userId,
@@ -14,7 +14,7 @@ export default function ScheduleTab({
 	onCanceled: (id: string) => void;
 }) {
 	return (
-		<div className="panel side-panel tab-panel">
+		<div className="panel side-panel tab-panel schedule-panel">
 			<AvailabilityCard
 				userId={userId}
 				allPlans={allPlans}

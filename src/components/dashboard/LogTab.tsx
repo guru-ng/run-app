@@ -1,5 +1,5 @@
-import LogRunForm from "@/components/LogRunForm";
-import RunsList from "@/components/RunsList";
+import LogRunForm from "@/components/runs/LogRunForm";
+import RunsList from "@/components/runs/RunsList";
 import type { Run } from "@/lib/types";
 
 export default function LogTab({

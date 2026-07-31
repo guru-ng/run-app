@@ -1,6 +1,6 @@
 import type { DayAvailability, Run } from "@/lib/types";
 import { addDaysIso, shortDateLabel, startOfWeekIso, todayIso } from "@/lib/dates";
-import SwipeStack from "@/components/SwipeStack";
+import SwipeStack from "@/components/ui/SwipeStack";
 
 function thisWeekStats(runs: Run[] | null) {
 	const start = startOfWeekIso();
