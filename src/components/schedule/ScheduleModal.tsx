@@ -52,25 +52,29 @@ export default function ScheduleModal({
 		setBusy(true);
 		setError(null);
 
-		// Update in place when there's already a plan for this day; inserting
-		// would leave the old row behind as a duplicate.
-		const { data, error: saveError } = existingPlan
-			? await updatePlannedRun({
-					id: existingPlan.id,
-					plannedDate: date,
-					timeOfDay,
-					runType,
-				})
-			: await insertPlannedRun({ userId, plannedDate: date, timeOfDay, runType });
+		try {
+			// Update in place when there's already a plan for this day; inserting
+			// would leave the old row behind as a duplicate.
+			const { data, error: saveError } = existingPlan
+				? await updatePlannedRun({
+						id: existingPlan.id,
+						plannedDate: date,
+						timeOfDay,
+						runType,
+					})
+				: await insertPlannedRun({ userId, plannedDate: date, timeOfDay, runType });
 
-		if (saveError) {
-			setError(saveError.message);
+			if (saveError) {
+				setError(saveError.message);
+				return;
+			}
+
+			onScheduled(data as PlannedRun);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Couldn't save that run. Try again.");
+		} finally {
 			setBusy(false);
-			return;
 		}
-
-		setBusy(false);
-		onScheduled(data as PlannedRun);
 	}
 
 	async function cancelExisting() {
@@ -78,16 +82,20 @@ export default function ScheduleModal({
 		setBusy(true);
 		setError(null);
 
-		const { error: deleteError } = await deletePlannedRun(existingPlan.id);
+		try {
+			const { error: deleteError } = await deletePlannedRun(existingPlan.id);
 
-		if (deleteError) {
-			setError(deleteError.message);
+			if (deleteError) {
+				setError(deleteError.message);
+				return;
+			}
+
+			onCanceled(existingPlan.id);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Couldn't cancel that run. Try again.");
+		} finally {
 			setBusy(false);
-			return;
 		}
-
-		setBusy(false);
-		onCanceled(existingPlan.id);
 	}
 
 	return (
