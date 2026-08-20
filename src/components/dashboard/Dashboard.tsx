@@ -119,7 +119,16 @@ export default function Dashboard({
 		setRuns((prev) => [run, ...(prev ?? [])]);
 	}
 
-	const loadError = runsError ?? plansError ?? badgesError;
+	// badgesError deliberately isn't folded in here: badges are a bonus, not
+	// core data, so a missing badges_earned table (e.g. before the migration
+	// in supabase/005_badges.sql has been run) shouldn't cover the whole page
+	// in a red error banner over runs/plans, which is what a shared loadError
+	// would do. Logged to the console instead, for debugging.
+	const loadError = runsError ?? plansError;
+
+	useEffect(() => {
+		if (badgesError) console.error("Failed to load badges:", badgesError.message);
+	}, [badgesError]);
 
 	if (isMobile) {
 		return (
