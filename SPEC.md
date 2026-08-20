@@ -106,12 +106,18 @@ upgrade path and `KNOWLEDGE.md` for the GPS gotchas (jitter filtering,
 permission handling, secure-context requirement).
 
 
-## Gamification #1+#2 (shipped)
+## Gamification #1+#2+#3 (shipped)
 
-`LogRunForm`'s success path now gets a CSS confetti burst plus a one-line
-callout from `src/lib/personalBests.ts` (`computePersonalBest`): first run
-ever, a new longest-run PR, or "Nth run this week" (>=3), falling back to a
-plain "Run logged!" otherwise. Both are computed from the `runs` a user
-already has (`LogTab` threads `runs` into `LogRunForm` for this) - no new
-table, no persisted state. Auto-clears after ~3.2s. See `PLAN.md` "Up next:
-Gamification" for the #3-10 options not yet built.
+`LogRunForm`'s success path gets a CSS pixel-art firework burst
+(`src/lib/season.ts` picks the color palette off the current meteorological
+season) plus a one-line callout from `src/lib/personalBests.ts`
+(`computePersonalBest`): first run ever, a new longest-run PR, or "Nth run
+this week" (>=3), falling back to a plain "Run logged!" otherwise. Both
+computed from the `runs` a user already has (`LogTab` threads `runs` into
+`LogRunForm`) - no new table, no persisted state. Auto-clears after ~3.2s.
+
+`LogTab` also shows a logging-streak badge (`src/lib/streaks.ts`,
+`computeStreak`) - distinct run-days in a row, with one skipped day forgiven
+per streak. Recomputed from `runs` on every render, nothing persisted.
+
+See `PLAN.md` "Up next: Gamification" for the #4-10 options not yet built.

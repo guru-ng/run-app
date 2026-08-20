@@ -23,9 +23,13 @@ memory each session.
 - GPS run tracking tier A: "Track a run" stopwatch mode in the Log tab
   (`watchPosition` + Haversine, no map, no schema change) — merged via PR #2,
   confirmed tracking correctly on a real phone (2026-08-20)
-- Gamification #1+#2: post-log confetti burst + personal-best callouts
-  (first run / new longest / Nth-run-this-week), pure CSS + client-computed,
-  no schema change (2026-08-20)
+- Gamification #1+#2: post-log pixel-art firework burst (seasonal palette,
+  reskinned from an earlier confetti version same-day) + personal-best
+  callouts (first run / new longest / Nth-run-this-week), pure CSS +
+  client-computed, no schema change (2026-08-20)
+- Gamification #3: forgiving logging streak badge on the Log tab — one
+  skipped day forgiven per streak, computed from `runs`, no schema change
+  (2026-08-20)
 
 ## Now
 
@@ -43,18 +47,26 @@ decision conversation: **don't ship more than one or two of these at once**
 — stacking badges/streaks/leaderboards together dilutes all of them; each
 is its own explicit decision, same rule as the GPS tiers below.
 
-- **#1 — Post-log dopamine moment. Shipped.** A confetti burst right after a
-  successful `insertRun()`. Pure CSS, no new dependency (radial burst faked
-  by rotating each piece then translating along that axis — no JS math).
+- **#1 — Post-log dopamine moment. Shipped, reskinned as pixel-art
+  fireworks.** A firework burst right after a successful `insertRun()`.
+  Pure CSS, no new dependency (radial burst faked by rotating each piece
+  then translating along that axis — no JS math; sharp corners + a
+  burst-then-fall arc + `steps()` timing for a blocky/8-bit feel instead of
+  confetti's smooth rounded drift). Colors cycle through a palette picked by
+  the current meteorological season (`src/lib/season.ts`) so "for this
+  season" rotates automatically instead of being hardcoded to one month.
   Lives in `LogRunForm.tsx` + `global.css`.
 - **#2 — Personal-best callouts. Shipped.** "Longest run yet" / "3rd run this
   week" / "first run ever" banner, computed client-side from the `runs` the
   user already has — no schema change. Surfaced at the moment of logging,
   not buried on a stats page. `src/lib/personalBests.ts`.
-- **#3 — Streaks with forgiveness.** A skip-day grace built in from day one
-  (a raw "any missed day resets to 0" streak reliably churns people who
-  travel/rest) — computed off `run_date` gaps, no new table for v1. Not
-  started.
+- **#3 — Streaks with forgiveness. Shipped.** One skipped day forgiven per
+  streak (not per week — simpler to reason about and explain in the UI) —
+  computed off `run_date` gaps, no new table. The gap between *today* and
+  the most recent log doesn't consume the grace token (not having logged
+  yet today/since yesterday is normal mid-streak state, not a skip) —
+  deliberately generous over strict for a friend-group app. Shown as a
+  badge above the Log tab's mode toggle. `src/lib/streaks.ts`.
 - **#4 — Achievement badges.** Distance/consistency milestones, persisted in
   a new `badges_earned` table so a badge doesn't un-earn itself later.
   Pace them — unlocking a dozen in week one makes badge #13 meaningless. Not
