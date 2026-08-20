@@ -26,8 +26,61 @@ memory each session.
 
 ## Now
 
-Nothing in progress. Working tree is clean; `main` is up to date with
-`origin/main` (PR #2 merged).
+Building gamification #1+#2 (see "Up next: Gamification" below) — the
+post-log dopamine moment and personal-best callouts.
+
+## Up next: Gamification (decided 2026-08-20)
+
+Ten options were laid out, ordered free → expensive (cost = ongoing
+maintenance/infra burden, not just build time). **Starting with #1+#2**
+since they're the highest ROI for zero schema change: right now
+`LogRunForm.tsx`'s success path is silent, which is the #1 reason logging a
+run doesn't feel rewarding. Explicit design note carried over from the
+decision conversation: **don't ship more than one or two of these at once**
+— stacking badges/streaks/leaderboards together dilutes all of them; each
+is its own explicit decision, same rule as the GPS tiers below.
+
+- **#1 — Post-log dopamine moment (building this first).** A confetti/flash
+  animation right after a successful `insertRun()`. Pure CSS, no new
+  dependency (don't reach for a confetti npm package — CSS particles do the
+  job). Lives in `LogRunForm.tsx` + `global.css`.
+- **#2 — Personal-best callouts (building this first).** "Longest run yet" /
+  "3rd run this week" banner, computed client-side from the `runs` the user
+  already has — no schema change. Surfaced at the moment of logging, not
+  buried on a stats page. New `src/lib/personalBests.ts`.
+- **#3 — Streaks with forgiveness.** A skip-day grace built in from day one
+  (a raw "any missed day resets to 0" streak reliably churns people who
+  travel/rest) — computed off `run_date` gaps, no new table for v1. Not
+  started.
+- **#4 — Achievement badges.** Distance/consistency milestones, persisted in
+  a new `badges_earned` table so a badge doesn't un-earn itself later.
+  Pace them — unlocking a dozen in week one makes badge #13 meaningless. Not
+  started.
+- **#5 — Kudos/reactions on `/posts`.** A single 🔥 reaction (not full
+  comments — no moderation surface needed for a friend group). New
+  `run_reactions` table + RLS. Not started.
+- **#6 — Weekly leaderboard.** Group-wide weekly distance, same query shape
+  as `fetchMatches`, no new table. Must ship at least two categories (e.g.
+  distance AND consistency) or make it opt-in — a single raw-distance
+  ranking quietly shames the slowest runner every week in a group where
+  everyone knows each other. Not started.
+- **#7 — Weekly quests.** Hardcoded in a TS array first ("log 3 runs this
+  week") — no database-driven quest authoring until rotating them by hand
+  becomes actual friction. Not started.
+- **#8 — Route photo per run.** First genuinely "expensive" tier: Supabase
+  Storage bucket + RLS + client-side image compression before upload (skip
+  the compression step and one uncompressed iPhone photo blows the feed
+  load time and the storage bill). Not started.
+- **#9 — Push notifications.** Needs a Supabase Edge Function + cron + Web
+  Push subscriptions — this app is deliberately backend-less (RLS-only)
+  today, so this is new always-on infra that can silently fail. Ship a kill
+  switch and frequency cap from day one. Not started.
+- **#10 — Seasonal events.** Themed monthly challenges/badges. The real cost
+  isn't the ~1 day of dev, it's inventing a new theme every month forever
+  afterward. Not started.
+
+Each item is its own explicit decision — shipping #1+#2 doesn't commit to
+#3-10. Update this section (and TODO.md) as more get built.
 
 ## Up next: GPS run tracking (decided 2026-08-19)
 
