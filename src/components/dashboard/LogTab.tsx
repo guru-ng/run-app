@@ -56,6 +56,7 @@ export default function LogTab({
 				<LogRunForm
 					key={prefill?.key}
 					userId={userId}
+					runs={runs}
 					onLogged={onLogged}
 					initialDistanceKm={prefill?.distanceKm}
 				/>

@@ -354,6 +354,49 @@ main {
   flex: 1;
 }
 
+/* Post-log dopamine moment (gamification #1) — a confetti burst anchored to
+   the submit button, plus a personal-best callout line (#2). Purely CSS, no
+   dependency: each piece rotates to its own angle then translates outward
+   along that now-rotated axis, faking a radial burst without JS math. */
+.log-submit-row {
+  position: relative;
+}
+
+.confetti-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: translate(-50%, -50%) rotate(var(--angle, 0deg));
+  animation: confetti-pop 700ms ease-out var(--delay, 0ms) both;
+}
+
+.confetti-piece:nth-child(3n) {
+  background: #ffd166;
+}
+
+.confetti-piece:nth-child(3n + 1) {
+  background: #06d6a0;
+}
+
+.log-celebration-text {
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  animation: rise 300ms ease both;
+}
+
 .input {
   width: 100%;
   padding: 0.75rem 0.9rem;
@@ -1240,6 +1283,17 @@ footer a:hover {
   }
 }
 
+@keyframes confetti-pop {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(-42px) scale(0.4);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dot,
   .panel,
@@ -1248,5 +1302,9 @@ footer a:hover {
   .swipe-arrow-left,
   .swipe-arrow-right {
     animation: none;
+  }
+
+  .confetti-burst {
+    display: none;
   }
 }
