@@ -23,9 +23,9 @@ memory each session.
 
 ## Now
 
-Nothing in progress. Working tree is clean; the desktop-sidebar-nav branch
-is fully merged into `origin/main` via PR #1. Local `main` just needs a pull
-(see TODO.md).
+GPS tracking tier A is built (`feat/gps-tracking-tier-a`, not yet merged) and
+needs real-phone verification — see TODO.md. Local `main` is up to date
+(fast-forwarded to `origin/main`'s PR #1 merge).
 
 ## Up next: GPS run tracking (decided 2026-08-19)
 
@@ -34,12 +34,15 @@ built as an *additional* entry point next to manual logging (not a
 replacement — GPS isn't always available, indoor/poor-signal runs still
 need manual entry):
 
-- **A — GPS stopwatch, no map (building this first).** Browser
-  `navigator.geolocation.watchPosition()` accumulates distance via the
-  Haversine formula between fixes, a timer runs alongside it. Stop → prefills
-  the existing log-run form with the tracked distance for review before
-  save. No map, no stored route, no new dependency, no schema change
-  (duration is shown live but not persisted in v1 — see KNOWLEDGE.md).
+- **A — GPS stopwatch, no map (built, pending phone verification).**
+  Browser `navigator.geolocation.watchPosition()` accumulates distance via
+  the Haversine formula between fixes, a timer runs alongside it. Stop →
+  prefills the existing log-run form with the tracked distance for review
+  before save. No map, no stored route, no new dependency, no schema change
+  (duration is shown live but not persisted in v1 — see KNOWLEDGE.md). Lives
+  in `src/lib/geo.ts`, `src/lib/hooks/useGpsTracker.ts`,
+  `src/components/runs/TrackRunPanel.tsx`, wired into `LogTab.tsx`'s new
+  Manual/Track a run toggle.
 - **B — same, + a simple line.** Adds a live path drawn on a bare
   canvas/SVG (relative coordinates, no map tiles). Still no external
   dependency. Not started; a later upgrade from A if wanted.

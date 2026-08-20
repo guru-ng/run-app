@@ -93,11 +93,14 @@ swipe-deck rules
 All locked and detailed in `CLAUDE.md` — don't duplicate here, read that
 file for the how/why.
 
-## Not yet built: GPS run tracking
+## GPS run tracking (tier A — built, pending real-phone verification)
 
-No tracking code exists yet — `runs` is still manual-entry only
-(`distance_km` typed in by hand via `LogRunForm`). A basic GPS-based
-"Track a run" mode is planned next; see `PLAN.md` "Up next" for the chosen
-approach (tier A: live stopwatch, no map, no schema change) and
-`KNOWLEDGE.md` for the technical gotchas to handle. Update this section
-once it actually ships.
+`LogTab` now has a Manual / Track a run toggle. Tracking uses
+`navigator.geolocation.watchPosition()` + Haversine distance (`src/lib/geo.ts`,
+`src/lib/hooks/useGpsTracker.ts`) shown live in `TrackRunPanel.tsx`; "Stop &
+review" hands the distance to the existing `LogRunForm` as a prefill — no new
+table, no new column. `runs` is still exactly the manual-entry shape above;
+duration is shown live during tracking but not persisted (no
+`duration_seconds` column exists). See `PLAN.md` "Up next" for the B/C/D
+upgrade path and `KNOWLEDGE.md` for the GPS gotchas (jitter filtering,
+permission handling, secure-context requirement).
