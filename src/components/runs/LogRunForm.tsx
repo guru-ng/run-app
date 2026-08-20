@@ -3,11 +3,14 @@ import { insertRun } from "@/lib/api/runs";
 import type { Run } from "@/lib/types";
 import { todayIso } from "@/lib/dates";
 import { computePersonalBest, describePersonalBest, type PersonalBest } from "@/lib/personalBests";
+import { seasonalFireworkPalette } from "@/lib/season";
 
-/** How many confetti pieces burst outward on a successful log (gamification #1). */
-const CONFETTI_PIECES = 10;
-/** How long the personal-best banner + confetti stay up before auto-clearing. */
+/** How many pixel sparks burst outward on a successful log (gamification #1). */
+const FIREWORK_PIECES = 12;
+/** How long the personal-best banner + firework stay up before auto-clearing. */
 const CELEBRATION_MS = 3200;
+/** Cycled per spark so the burst isn't a single flat color — rotates with the calendar. */
+const FIREWORK_COLORS = seasonalFireworkPalette();
 
 export default function LogRunForm({
 	userId,
@@ -105,15 +108,16 @@ export default function LogRunForm({
 					{busy ? "Logging…" : "Log run"}
 				</button>
 				{celebration && (
-					<span className="confetti-burst" aria-hidden="true" key={celebration.key}>
-						{Array.from({ length: CONFETTI_PIECES }).map((_, i) => (
+					<span className="firework-burst" aria-hidden="true" key={celebration.key}>
+						{Array.from({ length: FIREWORK_PIECES }).map((_, i) => (
 							<span
 								key={i}
-								className="confetti-piece"
+								className="firework-pixel"
 								style={
 									{
-										"--angle": `${(360 / CONFETTI_PIECES) * i}deg`,
-										"--delay": `${i * 20}ms`,
+										"--angle": `${(360 / FIREWORK_PIECES) * i}deg`,
+										"--delay": `${i * 18}ms`,
+										"--spark-color": FIREWORK_COLORS[i % FIREWORK_COLORS.length],
 									} as React.CSSProperties
 								}
 							/>

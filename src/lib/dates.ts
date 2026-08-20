@@ -20,6 +20,12 @@ export function addDaysIso(iso: string, days: number) {
 	return dateToIso(d);
 }
 
+/** Whole days between two ISO dates, order-independent. */
+export function daysBetween(a: string, b: string) {
+	const msPerDay = 24 * 60 * 60 * 1000;
+	return Math.round(Math.abs(isoToDate(a).getTime() - isoToDate(b).getTime()) / msPerDay);
+}
+
 /** First-of-month `months` away from `d` (pinned to day 1 to dodge overflow, e.g. Jan 31 + 1mo). */
 export function addMonths(d: Date, months: number) {
 	return new Date(d.getFullYear(), d.getMonth() + months, 1);

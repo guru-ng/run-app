@@ -354,39 +354,42 @@ main {
   flex: 1;
 }
 
-/* Post-log dopamine moment (gamification #1) — a confetti burst anchored to
-   the submit button, plus a personal-best callout line (#2). Purely CSS, no
-   dependency: each piece rotates to its own angle then translates outward
-   along that now-rotated axis, faking a radial burst without JS math. */
+/* Post-log dopamine moment (gamification #1) — a pixel-art firework burst
+   anchored to the submit button, plus a personal-best callout line (#2).
+   Purely CSS, no dependency: each spark rotates to its own angle then
+   translates outward along that now-rotated axis, faking a radial burst
+   without JS math. Colors come from lib/season.ts, so the palette rotates
+   with the calendar instead of being hardcoded to one season. */
 .log-submit-row {
   position: relative;
 }
 
-.confetti-burst {
+.firework-burst {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: visible;
 }
 
-.confetti-piece {
+.firework-pixel {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 6px;
-  height: 6px;
-  border-radius: 2px;
-  background: var(--accent);
+  width: 5px;
+  height: 5px;
+  border-radius: 0; /* sharp corners — the "pixel" in pixel-art, not confetti's rounded corner */
+  background: var(--spark-color, var(--accent));
+  box-shadow: 0 0 0 1px var(--spark-color, var(--accent));
+  image-rendering: pixelated;
   transform: translate(-50%, -50%) rotate(var(--angle, 0deg));
-  animation: confetti-pop 700ms ease-out var(--delay, 0ms) both;
+  animation: firework-pixel-pop 750ms steps(6, end) var(--delay, 0ms) both;
 }
 
-.confetti-piece:nth-child(3n) {
-  background: #ffd166;
-}
-
-.confetti-piece:nth-child(3n + 1) {
-  background: #06d6a0;
+/* Streak badge (gamification #3) above the Log tab's mode toggle. */
+.streak-badge {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
 }
 
 .log-celebration-text {
@@ -1283,13 +1286,21 @@ footer a:hover {
   }
 }
 
-@keyframes confetti-pop {
+/* Shoots out fast, hangs at the peak, then arcs down and fades — a firework
+   shell's shape, not a smooth confetti drift. `steps()` on the animation
+   itself (see .firework-pixel) is what makes the motion read as blocky/8-bit
+   rather than this eased curve alone. */
+@keyframes firework-pixel-pop {
   0% {
     transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(0) scale(1);
     opacity: 1;
   }
+  55% {
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(-44px) scale(1);
+    opacity: 1;
+  }
   100% {
-    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(-42px) scale(0.4);
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(-28px) scale(0.5);
     opacity: 0;
   }
 }
@@ -1304,7 +1315,7 @@ footer a:hover {
     animation: none;
   }
 
-  .confetti-burst {
+  .firework-burst {
     display: none;
   }
 }

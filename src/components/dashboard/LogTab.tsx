@@ -3,6 +3,7 @@ import LogRunForm from "@/components/runs/LogRunForm";
 import RunsList from "@/components/runs/RunsList";
 import TrackRunPanel from "@/components/runs/TrackRunPanel";
 import type { Run } from "@/lib/types";
+import { computeStreak, describeStreak } from "@/lib/streaks";
 
 export default function LogTab({
 	userId,
@@ -19,11 +20,16 @@ export default function LogTab({
 	// whatever it had in state from before.
 	const [prefill, setPrefill] = useState<{ distanceKm: number; key: number } | null>(null);
 
+	// Gamification #3 (see PLAN.md): a forgiving streak, recomputed from
+	// `runs` on every render — no persisted streak state to keep in sync.
+	const streakLabel = runs ? describeStreak(computeStreak(runs)) : null;
+
 	return (
 		<div className="panel tab-panel">
 			<h1 className="brand-title" style={{ fontSize: "1.4rem" }}>
 				Log a run
 			</h1>
+			{streakLabel && <p className="streak-badge">{streakLabel}</p>}
 			<div className="log-mode-toggle" role="tablist">
 				<button
 					type="button"
