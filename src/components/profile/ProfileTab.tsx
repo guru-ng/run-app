@@ -1,16 +1,23 @@
 import { useState } from "react";
 import { updateDisplayName } from "@/lib/api/profiles";
-import type { Profile } from "@/lib/types";
+import type { EarnedBadge, Profile } from "@/lib/types";
+import { BADGES } from "@/lib/badges";
 
 export default function ProfileTab({
 	profile,
 	onNameChanged,
 	onSignOut,
+	earnedBadges,
 }: {
 	profile: Profile;
 	onNameChanged: (name: string) => void;
 	onSignOut: () => void;
+	earnedBadges: EarnedBadge[] | null;
 }) {
+	// A Set dedupes: the backfill sync and a fresh log can each notice the
+	// same badge around the same time (see Dashboard.tsx), which can produce
+	// two identical rows in local state before the next fetch settles.
+	const earnedKeys = new Set((earnedBadges ?? []).map((b) => b.badge_key));
 	const [name, setName] = useState(profile.display_name);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -66,6 +73,22 @@ export default function ProfileTab({
 			<button className="link" onClick={onSignOut}>
 				Sign out
 			</button>
+			<div className="badges-section">
+				<h2 className="brand-title" style={{ fontSize: "1.1rem" }}>
+					Badges
+				</h2>
+				<div className="badges-grid">
+					{BADGES.map((b) => (
+						<span
+							key={b.key}
+							className={`badge-chip${earnedKeys.has(b.key) ? " earned" : " locked"}`}
+							title={b.description}
+						>
+							<span aria-hidden="true">{b.icon}</span> {b.name}
+						</span>
+					))}
+				</div>
+			</div>
 		</div>
 	);
 }

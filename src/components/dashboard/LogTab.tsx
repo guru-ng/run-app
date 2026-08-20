@@ -2,16 +2,18 @@ import { useState } from "react";
 import LogRunForm from "@/components/runs/LogRunForm";
 import RunsList from "@/components/runs/RunsList";
 import TrackRunPanel from "@/components/runs/TrackRunPanel";
-import type { Run } from "@/lib/types";
+import type { EarnedBadge, Run } from "@/lib/types";
 import { computeStreak, describeStreak } from "@/lib/streaks";
 
 export default function LogTab({
 	userId,
 	runs,
+	earnedBadges,
 	onLogged,
 }: {
 	userId: string;
 	runs: Run[] | null;
+	earnedBadges: EarnedBadge[] | null;
 	onLogged: (run: Run) => void;
 }) {
 	const [mode, setMode] = useState<"manual" | "track">("manual");
@@ -63,6 +65,7 @@ export default function LogTab({
 					key={prefill?.key}
 					userId={userId}
 					runs={runs}
+					earnedBadges={earnedBadges}
 					onLogged={onLogged}
 					initialDistanceKm={prefill?.distanceKm}
 				/>

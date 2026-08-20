@@ -233,7 +233,8 @@ main {
   .tab-panel .calendar-grid,
   .tab-panel .calendar-month-nav,
   .tab-panel .log-mode-toggle,
-  .tab-panel .track-run-panel {
+  .tab-panel .track-run-panel,
+  .tab-panel .badges-grid {
     max-width: 26rem;
   }
 
@@ -398,6 +399,50 @@ main {
   font-weight: 600;
   color: var(--accent);
   animation: rise 300ms ease both;
+}
+
+.log-celebration-badge {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fg);
+  animation: rise 300ms ease both;
+}
+
+/* Badge shelf (gamification #4) on the Profile tab. */
+.badges-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.badges-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-chip.earned {
+  background: var(--accent);
+  color: #05110c;
+  border-color: transparent;
+}
+
+.badge-chip.locked {
+  color: var(--muted);
+  opacity: 0.6;
+  filter: grayscale(1);
 }
 
 .input {

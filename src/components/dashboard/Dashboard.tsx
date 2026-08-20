@@ -3,7 +3,10 @@ import { supabase } from "@/lib/supabase";
 import type { PlannedRun, Profile, Run } from "@/lib/types";
 import { useOwnRuns } from "@/lib/hooks/useOwnRuns";
 import { useAllPlans } from "@/lib/hooks/useAllPlans";
+import { useEarnedBadges } from "@/lib/hooks/useEarnedBadges";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
+import { computeQualifyingBadges } from "@/lib/badges";
+import { insertEarnedBadges } from "@/lib/api/badges";
 import MatchesDeck from "@/components/matches/MatchesDeck";
 import InsightsDeck from "@/components/dashboard/InsightsDeck";
 import LatestLogsCard from "@/components/runs/LatestLogsCard";
@@ -47,11 +50,43 @@ export default function Dashboard({
 	// loads what the current page actually renders.
 	const needsRuns = isMobile || tab === "dashboard" || tab === "log";
 	const needsPlans = isMobile || tab === "dashboard" || tab === "schedule";
+	// Badges piggyback on needsRuns (the backfill sync below needs `runs` to
+	// compute totals) plus Profile, which shows the badge shelf on its own.
+	const needsBadges = needsRuns || tab === "profile";
 
 	const { runs, error: runsError, setRuns } = useOwnRuns(profile.id, needsRuns);
 	const { allPlans, error: plansError, setAllPlans } = useAllPlans(needsPlans);
+	const {
+		earnedBadges,
+		error: badgesError,
+		setEarnedBadges,
+	} = useEarnedBadges(profile.id, needsBadges);
 
 	const myLatestDistance = runs && runs.length > 0 ? runs[0].distance_km : null;
+
+	// Gamification #4 (see PLAN.md): silently backfills any badge the user
+	// already qualifies for but doesn't have on record — covers both someone
+	// who already had a big run history before this feature shipped, and the
+	// ordinary "just logged a run" case (runs changing re-triggers this too).
+	// No celebration UI here on purpose; that's LogRunForm's job for badges
+	// earned *at the moment* of logging. Self-terminating: once a badge is
+	// recorded, the next run of this effect no longer finds it "qualifying."
+	useEffect(() => {
+		if (!runs || !earnedBadges) return;
+		const earnedKeys = new Set(earnedBadges.map((b) => b.badge_key));
+		const qualifying = computeQualifyingBadges(runs, earnedKeys);
+		if (qualifying.length === 0) return;
+		insertEarnedBadges(
+			profile.id,
+			qualifying.map((b) => b.key),
+		).then(({ error }) => {
+			if (error) return;
+			setEarnedBadges((prev) => [
+				...(prev ?? []),
+				...qualifying.map((b) => ({ badge_key: b.key, earned_at: new Date().toISOString() })),
+			]);
+		});
+	}, [runs, earnedBadges, profile.id, setEarnedBadges]);
 
 	function addScheduled(p: PlannedRun) {
 		const entry = {
@@ -84,7 +119,7 @@ export default function Dashboard({
 		setRuns((prev) => [run, ...(prev ?? [])]);
 	}
 
-	const loadError = runsError ?? plansError;
+	const loadError = runsError ?? plansError ?? badgesError;
 
 	if (isMobile) {
 		return (
@@ -100,7 +135,12 @@ export default function Dashboard({
 						/>
 					)}
 					{activeTab === "log" && (
-						<LogTab userId={profile.id} runs={runs} onLogged={logRun} />
+						<LogTab
+							userId={profile.id}
+							runs={runs}
+							earnedBadges={earnedBadges}
+							onLogged={logRun}
+						/>
 					)}
 					{activeTab === "schedule" && (
 						<ScheduleTab
@@ -111,7 +151,12 @@ export default function Dashboard({
 						/>
 					)}
 					{activeTab === "profile" && (
-						<ProfileTab profile={profile} onNameChanged={onProfileChanged} onSignOut={signOut} />
+						<ProfileTab
+							profile={profile}
+							onNameChanged={onProfileChanged}
+							onSignOut={signOut}
+							earnedBadges={earnedBadges}
+						/>
 					)}
 				</div>
 				<TabBar active={activeTab} onChange={setActiveTab} />
@@ -148,7 +193,9 @@ export default function Dashboard({
 					</div>
 				)}
 
-				{tab === "log" && <LogTab userId={profile.id} runs={runs} onLogged={logRun} />}
+				{tab === "log" && (
+					<LogTab userId={profile.id} runs={runs} earnedBadges={earnedBadges} onLogged={logRun} />
+				)}
 
 				{tab === "schedule" && (
 					<ScheduleTab
@@ -160,7 +207,12 @@ export default function Dashboard({
 				)}
 
 				{tab === "profile" && (
-					<ProfileTab profile={profile} onNameChanged={onProfileChanged} onSignOut={signOut} />
+					<ProfileTab
+						profile={profile}
+						onNameChanged={onProfileChanged}
+						onSignOut={signOut}
+						earnedBadges={earnedBadges}
+					/>
 				)}
 			</div>
 		</div>

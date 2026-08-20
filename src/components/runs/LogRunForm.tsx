@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { insertRun } from "@/lib/api/runs";
-import type { Run } from "@/lib/types";
+import type { EarnedBadge, Run } from "@/lib/types";
 import { todayIso } from "@/lib/dates";
 import { computePersonalBest, describePersonalBest, type PersonalBest } from "@/lib/personalBests";
 import { seasonalFireworkPalette } from "@/lib/season";
+import { computeNewlyCrossedBadges, describeNewBadges } from "@/lib/badges";
 
 /** How many pixel sparks burst outward on a successful log (gamification #1). */
 const FIREWORK_PIECES = 12;
@@ -15,12 +16,15 @@ const FIREWORK_COLORS = seasonalFireworkPalette();
 export default function LogRunForm({
 	userId,
 	runs,
+	earnedBadges,
 	onLogged,
 	initialDistanceKm,
 }: {
 	userId: string;
 	/** The user's existing runs, used to work out if the new one is a personal best. */
 	runs: Run[] | null;
+	/** Already-earned badges, used to work out if the new run crosses a new one. */
+	earnedBadges: EarnedBadge[] | null;
 	onLogged: (run: Run) => void;
 	/** Prefilled from a finished GPS-tracked session (tier A) for review before save. */
 	initialDistanceKm?: number;
@@ -34,6 +38,7 @@ export default function LogRunForm({
 	const [error, setError] = useState<string | null>(null);
 	const [celebration, setCelebration] = useState<{
 		best: PersonalBest | null;
+		badgeText: string | null;
 		key: number;
 	} | null>(null);
 
@@ -63,8 +68,16 @@ export default function LogRunForm({
 				return;
 			}
 
+			const priorRuns = runs ?? [];
+			const earnedKeys = new Set((earnedBadges ?? []).map((b) => b.badge_key));
+			const newBadges = computeNewlyCrossedBadges(data as Run, priorRuns, earnedKeys);
+
 			onLogged(data as Run);
-			setCelebration({ best: computePersonalBest(data as Run, runs ?? []), key: Date.now() });
+			setCelebration({
+				best: computePersonalBest(data as Run, priorRuns),
+				badgeText: describeNewBadges(newBadges),
+				key: Date.now(),
+			});
 			setDistanceKm("");
 			setNotes("");
 		} catch (err) {
@@ -126,6 +139,7 @@ export default function LogRunForm({
 				)}
 			</div>
 			{celebration && <p className="log-celebration-text">{describePersonalBest(celebration.best)}</p>}
+			{celebration?.badgeText && <p className="log-celebration-badge">{celebration.badgeText}</p>}
 		</form>
 	);
 }

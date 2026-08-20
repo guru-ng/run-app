@@ -42,3 +42,9 @@ export type FeedRun = {
 	user_id: string;
 	display_name: string;
 };
+
+/** A row from `badges_earned` — gamification #4. Permanent once earned. */
+export type EarnedBadge = {
+	badge_key: string;
+	earned_at: string;
+};
