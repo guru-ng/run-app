@@ -64,6 +64,11 @@ Client-side only: capped at **10 active plans per user** (`ScheduleModal.tsx`,
 `MAX_SCHEDULED_RUNS`) — not a DB constraint/trigger. Known trade-off, not
 currently worth a migration for a friends-pilot scale.
 
+### `badges_earned` (gamification #4, migration 005 — **not yet run**, see TODO.md)
+`id` · `user_id` → profiles · `badge_key` (text, matches a key in
+`src/lib/badges.ts`'s `BADGES` array) · `earned_at` · unique on
+(`user_id`, `badge_key`)
+
 ## RLS summary
 
 | Table          | Read                  | Write                          |
@@ -72,6 +77,7 @@ currently worth a migration for a friends-pilot scale.
 | `runs`         | all authenticated       | own rows only                   |
 | `invite_codes` | nobody (browser)        | nobody (browser) — RPC only     |
 | `planned_runs` | all authenticated (migration 004) | own rows only        |
+| `badges_earned` (migration 005) | all authenticated | own rows only, insert-only (no update/delete — permanent once earned) |
 
 `planned_runs` started own-read-only (`003_planned_runs.sql`) and was opened
 to shared reads by `004_share_availability.sql` — "we want others to see the
@@ -120,4 +126,16 @@ computed from the `runs` a user already has (`LogTab` threads `runs` into
 `computeStreak`) - distinct run-days in a row, with one skipped day forgiven
 per streak. Recomputed from `runs` on every render, nothing persisted.
 
-See `PLAN.md` "Up next: Gamification" for the #4-10 options not yet built.
+## Gamification #4: achievement badges (code shipped, migration pending)
+
+8 paced distance/run-count milestones (`src/lib/badges.ts`, `BADGES`),
+persisted in `badges_earned` (see Data model above — **migration 005 hasn't
+been run yet**, so this does nothing live until then). `computeNewlyCrossedBadges`
+drives the post-log celebration in `LogRunForm` (only what *this* run
+crossed); `computeQualifyingBadges` drives a silent backfill sync in
+`Dashboard.tsx` (anyone who already qualified before this shipped, or missed
+a marginal crossing for any reason) — the only place that actually inserts,
+so there's a single writer. Profile tab shows a badge shelf (earned chips
+highlighted, locked ones dimmed, description on hover).
+
+See `PLAN.md` "Up next: Gamification" for the #5-10 options not yet built.

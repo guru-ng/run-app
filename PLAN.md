@@ -30,6 +30,10 @@ memory each session.
 - Gamification #3: forgiving logging streak badge on the Log tab — one
   skipped day forgiven per streak, computed from `runs`, no schema change
   (2026-08-20)
+- Gamification #4: achievement badges (`badges_earned` table, 8 paced
+  distance/run-count milestones), a shelf on the Profile tab, and a silent
+  backfill sync for anyone who already qualified before this shipped
+  (2026-08-20) — **migration not yet run**, see TODO.md
 
 ## Now
 
@@ -67,10 +71,16 @@ is its own explicit decision, same rule as the GPS tiers below.
   yet today/since yesterday is normal mid-streak state, not a skip) —
   deliberately generous over strict for a friend-group app. Shown as a
   badge above the Log tab's mode toggle. `src/lib/streaks.ts`.
-- **#4 — Achievement badges.** Distance/consistency milestones, persisted in
-  a new `badges_earned` table so a badge doesn't un-earn itself later.
-  Pace them — unlocking a dozen in week one makes badge #13 meaningless. Not
-  started.
+- **#4 — Achievement badges. Code shipped, migration pending.** 8 paced
+  distance/run-count milestones (first run through 500 lifetime km),
+  persisted in a new `badges_earned` table so a badge doesn't un-earn itself
+  if the thresholds change later. Two compute paths: `computeNewlyCrossedBadges`
+  (before/after totals) drives the post-log celebration, `computeQualifyingBadges`
+  (current totals only) drives a silent backfill sync in `Dashboard.tsx` for
+  anyone who already qualified before this shipped. Shelf on the Profile tab.
+  `src/lib/badges.ts`, `supabase/005_badges.sql` — **the migration needs to be
+  run manually in the Supabase SQL editor before this works live**, see
+  TODO.md.
 - **#5 — Kudos/reactions on `/posts`.** A single 🔥 reaction (not full
   comments — no moderation surface needed for a friend group). New
   `run_reactions` table + RLS. Not started.
