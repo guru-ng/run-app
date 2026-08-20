@@ -6,11 +6,16 @@ import { todayIso } from "@/lib/dates";
 export default function LogRunForm({
 	userId,
 	onLogged,
+	initialDistanceKm,
 }: {
 	userId: string;
 	onLogged: (run: Run) => void;
+	/** Prefilled from a finished GPS-tracked session (tier A) for review before save. */
+	initialDistanceKm?: number;
 }) {
-	const [distanceKm, setDistanceKm] = useState("");
+	const [distanceKm, setDistanceKm] = useState(() =>
+		initialDistanceKm ? initialDistanceKm.toFixed(2) : "",
+	);
 	const [runDate, setRunDate] = useState(() => todayIso());
 	const [notes, setNotes] = useState("");
 	const [busy, setBusy] = useState(false);
