@@ -22,7 +22,7 @@ memory each session.
 - Schedule modal: Save/Cancel buttons, selectable popup text, 10-plan cap
 - GPS run tracking tier A: "Track a run" stopwatch mode in the Log tab
   (`watchPosition` + Haversine, no map, no schema change) — merged via PR #2,
-  pending real-phone verification (see TODO.md)
+  confirmed tracking correctly on a real phone (2026-08-20)
 
 ## Now
 
@@ -36,7 +36,7 @@ least difficult** and built as an *additional* entry point next to manual
 logging (not a replacement — GPS isn't always available, indoor/poor-signal
 runs still need manual entry). B/C/D remain future, separate decisions:
 
-- **A — GPS stopwatch, no map. Shipped, pending phone verification.**
+- **A — GPS stopwatch, no map. Shipped and verified on a real phone.**
   Browser `navigator.geolocation.watchPosition()` accumulates distance via
   the Haversine formula between fixes, a timer runs alongside it. Stop →
   prefills the existing log-run form with the tracked distance for review

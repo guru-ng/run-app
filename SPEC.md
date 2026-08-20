@@ -93,7 +93,7 @@ swipe-deck rules
 All locked and detailed in `CLAUDE.md` — don't duplicate here, read that
 file for the how/why.
 
-## GPS run tracking (tier A — built, pending real-phone verification)
+## GPS run tracking (tier A — shipped, verified on a real phone)
 
 `LogTab` now has a Manual / Track a run toggle. Tracking uses
 `navigator.geolocation.watchPosition()` + Haversine distance (`src/lib/geo.ts`,
