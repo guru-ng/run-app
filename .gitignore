@@ -32,6 +32,7 @@ yarn-error.log*
 # local-only notes / DB migrations (not version-controlled)
 HANDOFF.md
 CLAUDE.md
+PROMPT.md
 /supabase/
 
 #stitch UI design folder
