@@ -104,3 +104,14 @@ duration is shown live during tracking but not persisted (no
 `duration_seconds` column exists). See `PLAN.md` "Up next" for the B/C/D
 upgrade path and `KNOWLEDGE.md` for the GPS gotchas (jitter filtering,
 permission handling, secure-context requirement).
+
+
+## Gamification #1+#2 (shipped)
+
+`LogRunForm`'s success path now gets a CSS confetti burst plus a one-line
+callout from `src/lib/personalBests.ts` (`computePersonalBest`): first run
+ever, a new longest-run PR, or "Nth run this week" (>=3), falling back to a
+plain "Run logged!" otherwise. Both are computed from the `runs` a user
+already has (`LogTab` threads `runs` into `LogRunForm` for this) - no new
+table, no persisted state. Auto-clears after ~3.2s. See `PLAN.md` "Up next:
+Gamification" for the #3-10 options not yet built.

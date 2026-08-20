@@ -23,11 +23,14 @@ memory each session.
 - GPS run tracking tier A: "Track a run" stopwatch mode in the Log tab
   (`watchPosition` + Haversine, no map, no schema change) — merged via PR #2,
   confirmed tracking correctly on a real phone (2026-08-20)
+- Gamification #1+#2: post-log confetti burst + personal-best callouts
+  (first run / new longest / Nth-run-this-week), pure CSS + client-computed,
+  no schema change (2026-08-20)
 
 ## Now
 
-Building gamification #1+#2 (see "Up next: Gamification" below) — the
-post-log dopamine moment and personal-best callouts.
+Nothing in progress. Working tree is clean, `main` is up to date with
+`origin/main`.
 
 ## Up next: Gamification (decided 2026-08-20)
 
@@ -40,14 +43,14 @@ decision conversation: **don't ship more than one or two of these at once**
 — stacking badges/streaks/leaderboards together dilutes all of them; each
 is its own explicit decision, same rule as the GPS tiers below.
 
-- **#1 — Post-log dopamine moment (building this first).** A confetti/flash
-  animation right after a successful `insertRun()`. Pure CSS, no new
-  dependency (don't reach for a confetti npm package — CSS particles do the
-  job). Lives in `LogRunForm.tsx` + `global.css`.
-- **#2 — Personal-best callouts (building this first).** "Longest run yet" /
-  "3rd run this week" banner, computed client-side from the `runs` the user
-  already has — no schema change. Surfaced at the moment of logging, not
-  buried on a stats page. New `src/lib/personalBests.ts`.
+- **#1 — Post-log dopamine moment. Shipped.** A confetti burst right after a
+  successful `insertRun()`. Pure CSS, no new dependency (radial burst faked
+  by rotating each piece then translating along that axis — no JS math).
+  Lives in `LogRunForm.tsx` + `global.css`.
+- **#2 — Personal-best callouts. Shipped.** "Longest run yet" / "3rd run this
+  week" / "first run ever" banner, computed client-side from the `runs` the
+  user already has — no schema change. Surfaced at the moment of logging,
+  not buried on a stats page. `src/lib/personalBests.ts`.
 - **#3 — Streaks with forgiveness.** A skip-day grace built in from day one
   (a raw "any missed day resets to 0" streak reliably churns people who
   travel/rest) — computed off `run_date` gaps, no new table for v1. Not
