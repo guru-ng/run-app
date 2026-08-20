@@ -20,21 +20,23 @@ memory each session.
   through Astro's view-transition router so rail clicks don't reload the page
 - Single-run detail page (`/run/?id=`), own runs only, read-only
 - Schedule modal: Save/Cancel buttons, selectable popup text, 10-plan cap
+- GPS run tracking tier A: "Track a run" stopwatch mode in the Log tab
+  (`watchPosition` + Haversine, no map, no schema change) — merged via PR #2,
+  pending real-phone verification (see TODO.md)
 
 ## Now
 
-GPS tracking tier A is built (`feat/gps-tracking-tier-a`, not yet merged) and
-needs real-phone verification — see TODO.md. Local `main` is up to date
-(fast-forwarded to `origin/main`'s PR #1 merge).
+Nothing in progress. Working tree is clean; `main` is up to date with
+`origin/main` (PR #2 merged).
 
 ## Up next: GPS run tracking (decided 2026-08-19)
 
-Four difficulty tiers were proposed; **starting with the least difficult**,
-built as an *additional* entry point next to manual logging (not a
-replacement — GPS isn't always available, indoor/poor-signal runs still
-need manual entry):
+Four difficulty tiers were proposed; tier A is done, **starting with the
+least difficult** and built as an *additional* entry point next to manual
+logging (not a replacement — GPS isn't always available, indoor/poor-signal
+runs still need manual entry). B/C/D remain future, separate decisions:
 
-- **A — GPS stopwatch, no map (built, pending phone verification).**
+- **A — GPS stopwatch, no map. Shipped, pending phone verification.**
   Browser `navigator.geolocation.watchPosition()` accumulates distance via
   the Haversine formula between fixes, a timer runs alongside it. Stop →
   prefills the existing log-run form with the tracked distance for review
